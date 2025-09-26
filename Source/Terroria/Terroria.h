@@ -6,3 +6,5 @@
 
 /** Main log category used across the project */
 DECLARE_LOG_CATEGORY_EXTERN(LogTerroria, Log, All);
+
+#define CUSTOM_DEPTH_RED 250

@@ -21,7 +21,8 @@ public class Terroria : ModuleRules
 			"Slate",
 			"GameplayTasks",
 			"GameplayTags",
-			"GameplayAbilities"
+			"GameplayAbilities",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
