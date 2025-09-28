@@ -6,7 +6,9 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/TPlayerController.h"
 #include "Player/TPlayerState.h"
+#include "UI/HUD/THUD.h"
 
 ATPlayerCharacter::ATPlayerCharacter()
 {
@@ -49,6 +51,14 @@ void ATPlayerCharacter::SetupAbilityActorInfo()
 	TPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(TPlayerState, this);
 	AbilitySystemComponent = TPlayerState->GetAbilitySystemComponent();
 	AttributeSet = TPlayerState->GetAttributeSet();
+
+	if (ATPlayerController* TPlayerController = Cast<ATPlayerController>(GetController()))
+	{
+		if (ATHUD* THUD = Cast<ATHUD>(TPlayerController->GetHUD()))
+		{
+			THUD->InitOverlayHUD(TPlayerController, TPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 void ATPlayerCharacter::UpdateCameraZoom(float LengthDelta) const

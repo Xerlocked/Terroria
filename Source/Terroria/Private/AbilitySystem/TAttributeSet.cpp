@@ -2,11 +2,14 @@
 
 
 #include "AbilitySystem/TAttributeSet.h"
-#include "AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 
 UTAttributeSet::UTAttributeSet()
 {
+	InitHealth(100.0f);
+	InitMaxHealth(100.0f);
+	InitMana(100.0f);
+	InitMaxMana(100.0f);
 }
 
 void UTAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

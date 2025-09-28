@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
 #include "TAttributeSet.generated.h"
 
@@ -22,15 +23,19 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Character|Vital")
 	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Health)
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Character|Vital")
 	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, MaxHealth)
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Character|Vital")
 	FGameplayAttributeData Mana;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Mana)
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana, Category = "Character|Vital")
 	FGameplayAttributeData MaxMana;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, MaxMana)
 	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue) const;
