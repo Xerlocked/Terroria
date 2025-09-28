@@ -25,7 +25,58 @@ void ATAbilityActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGamep
 	EffectContextHandle.AddSourceObject(this);
 
 	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(EffectToApply, 1.f, EffectContextHandle);
-	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	FActiveGameplayEffectHandle ActiveGameplayEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+
+	if (EffectSpecHandle.Data.Get()->Def->DurationPolicy == EGameplayEffectDurationType::Infinite &&
+		RemovalPolicy == EEffectRemovalPolicy::OnEndOverlaps)
+	{
+		ActiveGameplayEffectHandles.Add(ActiveGameplayEffectHandle, TargetASC);
+	}
+}
+
+void ATAbilityActor::RemoveEffectFromTarget(AActor* TargetActor)
+{
+	if (ActiveGameplayEffectHandles.IsEmpty()) return;
+	
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!IsValid(TargetASC)) return;
+
+	TArray<FActiveGameplayEffectHandle> RemoveToHandle;
+	for (TPair Handles : ActiveGameplayEffectHandles)
+	{
+		if (TargetASC == Handles.Value)
+		{
+			TargetASC->RemoveActiveGameplayEffect(Handles.Key, 1);
+			RemoveToHandle.Add(Handles.Key);
+		}
+	}
+
+	for (FActiveGameplayEffectHandle& Handle : RemoveToHandle)
+	{
+		ActiveGameplayEffectHandles.FindAndRemoveChecked(Handle);
+	}
+	
+}
+
+void ATAbilityActor::OnBeginOverlap(AActor* OverlappedActor)
+{
+	if (ApplyPolicy == EEffectApplyPolicy::OnBeginOverlaps)
+	{
+		ApplyEffectToTarget(OverlappedActor, GameplayEffectClass);
+	}
+}
+
+void ATAbilityActor::OnEndOverlap(AActor* OverlappedActor)
+{
+	if (ApplyPolicy == EEffectApplyPolicy::OnEndOverlaps)
+	{
+		ApplyEffectToTarget(OverlappedActor, GameplayEffectClass);
+	}
+
+	if (RemovalPolicy == EEffectRemovalPolicy::OnEndOverlaps)
+	{
+		RemoveEffectFromTarget(OverlappedActor);
+	}
 }
 
 
