@@ -5,7 +5,41 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "GameplayEffectExtension.h"
 #include "TAttributeSet.generated.h"
+
+USTRUCT()
+struct FEffectProperty
+{
+	GENERATED_BODY()
+	FEffectProperty() {}
+
+	FGameplayEffectContextHandle ContextHandle;
+
+	UPROPERTY()
+	UAbilitySystemComponent* InstigatorASC = nullptr;
+
+	UPROPERTY()
+	AActor* InstigatorAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* InstigatorController = nullptr;
+
+	UPROPERTY()
+	ACharacter* InstigatorCharacter = nullptr;
+
+	UPROPERTY()
+	UAbilitySystemComponent* TargetASC = nullptr;
+
+	UPROPERTY()
+	AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* TargetController = nullptr;
+
+	UPROPERTY()
+	ACharacter* TargetCharacter = nullptr;
+};
 
 /**
  * 
@@ -21,6 +55,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Character|Vital")
@@ -50,4 +86,7 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
+
+private:
+	void GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property);
 };

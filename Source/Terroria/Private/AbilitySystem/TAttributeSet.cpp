@@ -2,6 +2,8 @@
 
 
 #include "AbilitySystem/TAttributeSet.h"
+#include "GameplayEffectExtension.h"
+#include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
 UTAttributeSet::UTAttributeSet()
@@ -36,6 +38,49 @@ void UTAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 	{
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
 	}
+}
+
+void UTAttributeSet::GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property)
+{
+	Property.ContextHandle = Data.EffectSpec.GetContext();
+
+	Property.InstigatorASC = Property.ContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Property.InstigatorASC) && Property.InstigatorASC->AbilityActorInfo.IsValid() && Property.InstigatorASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Property.InstigatorAvatarActor = Property.InstigatorASC->AbilityActorInfo->AvatarActor.Get();
+		Property.InstigatorController = Property.InstigatorASC->AbilityActorInfo->PlayerController.Get();
+
+		if (Property.InstigatorAvatarActor != nullptr && Property.InstigatorController == nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(Property.InstigatorAvatarActor))
+			{
+				Property.InstigatorController = Pawn->GetController();
+			}
+		}
+
+		if (Property.InstigatorController)
+		{
+			Property.InstigatorCharacter = Cast<ACharacter>(Property.InstigatorController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Property.TargetASC = &Data.Target;
+		Property.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		Property.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Property.TargetCharacter = Cast<ACharacter>(Property.TargetAvatarActor);
+	}
+}
+
+
+void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	FEffectProperty EffectProperty;
+	GetGameplayEffectProperty(Data, EffectProperty);
 }
 
 void UTAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue) const
