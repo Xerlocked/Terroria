@@ -24,4 +24,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bActiveHighlight;
+
+protected:
+	virtual void SetupAbilityActorInfo() override;
 };

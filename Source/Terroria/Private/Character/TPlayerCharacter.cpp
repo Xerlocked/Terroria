@@ -3,6 +3,7 @@
 #include "Public/Character/TPlayerCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/TAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -50,6 +51,7 @@ void ATPlayerCharacter::SetupAbilityActorInfo()
 	
 	TPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(TPlayerState, this);
 	AbilitySystemComponent = TPlayerState->GetAbilitySystemComponent();
+	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->BindAbilityActorInfo();
 	AttributeSet = TPlayerState->GetAttributeSet();
 
 	if (ATPlayerController* TPlayerController = Cast<ATPlayerController>(GetController()))

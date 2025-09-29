@@ -30,7 +30,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 private:
-	void SetupAbilityActorInfo();
+	virtual void SetupAbilityActorInfo() override;
 	
 public:
 	UCameraComponent* GetPlayerCameraComponent() const { return PlayerCamera; }

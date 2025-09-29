@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "TAbilitySystemComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAssetTagsEvent, const FGameplayTagContainer&)
+
 /**
  * 
  */
@@ -13,5 +15,13 @@ UCLASS()
 class TERRORIA_API UTAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
+
+public:
+	void BindAbilityActorInfo();
+
+	FOnAssetTagsEvent AssetTagsEvent;
 	
+protected:
+
+	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 };

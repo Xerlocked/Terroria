@@ -14,7 +14,7 @@ void ATEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	SetupAbilityActorInfo();
 }
 
 void ATEnemyCharacter::ActiveHighlightActor()
@@ -32,4 +32,10 @@ void ATEnemyCharacter::DeactiveHighlightActor()
 	UE_LOG(LogTemp, Warning, TEXT("Deactive Highlight Actor"));
 
 	bActiveHighlight = false;
+}
+
+void ATEnemyCharacter::SetupAbilityActorInfo()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->BindAbilityActorInfo();
 }

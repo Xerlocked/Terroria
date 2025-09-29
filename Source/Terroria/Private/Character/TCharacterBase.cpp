@@ -19,3 +19,8 @@ UAbilitySystemComponent* ATCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent.Get();
 }
 
+void ATCharacterBase::SetupAbilityActorInfo()
+{
+	
+}
+

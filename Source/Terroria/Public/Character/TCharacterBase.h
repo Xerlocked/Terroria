@@ -23,6 +23,8 @@ public:
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
 	
 protected:
+	virtual void SetupAbilityActorInfo();
+	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	

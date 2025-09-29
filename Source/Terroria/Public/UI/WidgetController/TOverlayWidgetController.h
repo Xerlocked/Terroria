@@ -6,12 +6,25 @@
 #include "TUserWidgetController.h"
 #include "TOverlayWidgetController.generated.h"
 
+USTRUCT(BlueprintType)
+struct FWidgetMessageRow : public FTableRowBase
+{
+	GENERATED_BODY()
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Tags")
+	FGameplayTag MessageTag = FGameplayTag();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Display on message")
+	FText Message = FText();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName = "Widget")
+	TSubclassOf<class UTUserWidget> MessageWidget;
+};
+
+class UTUserWidget;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAssetTagMessageSignature, FWidgetMessageRow, WidgetMessageRow);
 
 /**
  * 
@@ -27,23 +40,30 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnHealthChangedSignature OnHealthChanged;
+	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnMaxHealthChangedSignature OnMaxHealthChanged;
+	FOnAttributeChangedSignature OnMaxHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnManaChangedSignature OnManaChanged;
+	FOnAttributeChangedSignature OnManaChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
-	FOnMaxManaChangedSignature OnMaxManaChanged;
+	FOnAttributeChangedSignature OnMaxManaChanged;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Message")
+	FOnAssetTagMessageSignature OnAssetTagMessage;
+	
 protected:
-	void CallbackHealth(const FOnAttributeChangeData& Data);
-
-	void CallbackMaxHealth(const FOnAttributeChangeData& Data);
-
-	void CallbackMana(const FOnAttributeChangeData& Data);
-
-	void CallbackMaxMana(const FOnAttributeChangeData& Data);
+	template<typename T>
+	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|DataTable")
+	TObjectPtr<UDataTable> WidgetMessageDataTable;
 };
+
+template <typename T>
+T* UTOverlayWidgetController::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+}
