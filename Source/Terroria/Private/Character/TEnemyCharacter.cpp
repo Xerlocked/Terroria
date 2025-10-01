@@ -21,17 +21,16 @@ void ATEnemyCharacter::ActiveHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
-	UE_LOG(LogTemp, Warning, TEXT("Active Highlight Actor"));
-
-	bActiveHighlight = true;
 }
 
 void ATEnemyCharacter::DeactiveHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
-	UE_LOG(LogTemp, Warning, TEXT("Deactive Highlight Actor"));
+}
 
-	bActiveHighlight = false;
+int32 ATEnemyCharacter::GetPlayerLevel() const
+{
+	return Level;
 }
 
 void ATEnemyCharacter::SetupAbilityActorInfo()

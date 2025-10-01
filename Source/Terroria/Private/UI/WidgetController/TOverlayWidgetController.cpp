@@ -37,7 +37,7 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
 	{
-		OnManaChanged.Broadcast(Data.NewValue);
+		OnMaxManaChanged.Broadcast(Data.NewValue);
 	});
 
 	check(WidgetMessageDataTable);

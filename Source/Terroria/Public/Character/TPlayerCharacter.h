@@ -29,6 +29,8 @@ public:
 
 	virtual void OnRep_PlayerState() override;
 
+	virtual int32 GetPlayerLevel() const override;
+
 private:
 	virtual void SetupAbilityActorInfo() override;
 	

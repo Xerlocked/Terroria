@@ -22,9 +22,11 @@ public:
 	virtual void DeactiveHighlightActor() override;
 	//~End Highlight interface
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bActiveHighlight;
+	virtual int32 GetPlayerLevel() const override;
 
 protected:
 	virtual void SetupAbilityActorInfo() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
+	int32 Level = 1;
 };

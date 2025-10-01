@@ -44,6 +44,14 @@ void ATPlayerCharacter::OnRep_PlayerState()
 	SetupAbilityActorInfo();
 }
 
+int32 ATPlayerCharacter::GetPlayerLevel() const
+{
+	const ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	
+	return TPlayerState->GetPlayerLevel();
+}
+
 void ATPlayerCharacter::SetupAbilityActorInfo()
 {
 	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
@@ -61,6 +69,8 @@ void ATPlayerCharacter::SetupAbilityActorInfo()
 			THUD->InitOverlayHUD(TPlayerController, TPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitializeDefaultAttributes();
 }
 
 void ATPlayerCharacter::UpdateCameraZoom(float LengthDelta) const

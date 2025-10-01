@@ -19,8 +19,29 @@ UAbilitySystemComponent* ATCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent.Get();
 }
 
+int32 ATCharacterBase::GetPlayerLevel() const
+{
+	return 0;
+}
+
 void ATCharacterBase::SetupAbilityActorInfo()
 {
 	
+}
+
+void ATCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass, float Level) const
+{
+	check(EffectClass);
+
+	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(EffectClass, Level,  ContextHandle);
+
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void ATCharacterBase::InitializeDefaultAttributes() const
+{
+	ApplyEffectToSelf(PrimaryAttributes, 1.0f);
+	ApplyEffectToSelf(SecondaryAttributes, 1.0f);
 }
 
