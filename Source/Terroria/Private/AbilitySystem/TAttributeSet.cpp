@@ -8,8 +8,6 @@
 
 UTAttributeSet::UTAttributeSet()
 {
-	InitHealth(50.0f);
-	InitMana(100.0f);
 }
 
 void UTAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

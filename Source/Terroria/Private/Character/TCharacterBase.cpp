@@ -33,7 +33,8 @@ void ATCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass
 {
 	check(EffectClass);
 
-	const FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(EffectClass, Level,  ContextHandle);
 
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
@@ -43,5 +44,6 @@ void ATCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(PrimaryAttributes, 1.0f);
 	ApplyEffectToSelf(SecondaryAttributes, 1.0f);
+	ApplyEffectToSelf(VitalAttributes, 1.0f);
 }
 
