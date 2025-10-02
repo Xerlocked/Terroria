@@ -14,13 +14,29 @@ void UTAttributeMenuWidgetController::BroadcastInitialValues()
 
 	for (auto& Pair : AS->TagsToAttributes)
 	{
-		FTAttributeData AttributeData = AttributeDataAsset->FindAttributeDataByTag(Pair.Key);
-		AttributeData.AttributeValue = Pair.Value().GetNumericValue(AS);
-		OnAttributeDataDelegate.Broadcast(AttributeData);
+		BroadcastOnAttributeData(Pair.Key, Pair.Value());
 	}
 }
 
 void UTAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
-	
+	UTAttributeSet* AS = CastChecked<UTAttributeSet>(AttributeSet);
+	check(AttributeDataAsset);
+
+	for (auto& Pair : AS->TagsToAttributes)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
+			[this, Pair](const FOnAttributeChangeData& Data)
+			{
+				BroadcastOnAttributeData(Pair.Key, Pair.Value());
+			}
+		);
+	}
+}
+
+void UTAttributeMenuWidgetController::BroadcastOnAttributeData(const FGameplayTag& Tag, const FGameplayAttribute& Attribute) const
+{
+	FTAttributeData AttributeData = AttributeDataAsset->FindAttributeDataByTag(Tag);
+	AttributeData.AttributeValue = Attribute.GetNumericValue(AttributeSet);
+	OnAttributeDataDelegate.Broadcast(AttributeData);
 }

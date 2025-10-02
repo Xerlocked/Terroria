@@ -29,4 +29,7 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UTAttributeDataAsset> AttributeDataAsset;
+
+private:
+	void BroadcastOnAttributeData(const FGameplayTag& Tag, const FGameplayAttribute& Attribute) const;
 };
