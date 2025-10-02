@@ -41,6 +41,9 @@ struct FEffectProperty
 	ACharacter* TargetCharacter = nullptr;
 };
 
+template<class T>
+using TStaticFuncPtr = TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -60,6 +63,8 @@ public:
 	
 public:
 
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
+	
 	//~  Begin Primary Attributes (핵심 능력치)
 	// 플레이어가 직접 포인트를 투자하는 능력치
 

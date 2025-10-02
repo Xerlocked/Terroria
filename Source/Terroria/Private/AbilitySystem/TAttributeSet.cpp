@@ -3,11 +3,19 @@
 
 #include "AbilitySystem/TAttributeSet.h"
 #include "GameplayEffectExtension.h"
+#include "TGameplayTags.h"
+#include "AbilitySystem/Data/TAttributeDataAsset.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
 UTAttributeSet::UTAttributeSet()
 {
+	const FTGameplayTags& GameplayTags = FTGameplayTags::Get();
+
+	TagsToAttributes.Add(GameplayTags.Attribute_Primary_Strength, GetStrengthAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Primary_Agility, GetAgilityAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Primary_Intelligence, GetIntelligenceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attribute_Primary_Luck, GetLuckAttribute);
 }
 
 void UTAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
