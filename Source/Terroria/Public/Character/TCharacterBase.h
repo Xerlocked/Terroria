@@ -8,6 +8,7 @@
 #include "Interface/StatusInterface.h"
 #include "TCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -32,6 +33,8 @@ protected:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass, float Level) const;
 	
 	void InitializeDefaultAttributes() const;
+
+	void AddCharacterAbilities();
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -47,4 +50,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Attributes")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "GAS|Abilites")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

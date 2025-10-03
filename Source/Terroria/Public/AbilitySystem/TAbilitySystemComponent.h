@@ -19,6 +19,8 @@ class TERRORIA_API UTAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void BindAbilityActorInfo();
 
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
+
 	FOnAssetTagsEvent AssetTagsEvent;
 	
 protected:

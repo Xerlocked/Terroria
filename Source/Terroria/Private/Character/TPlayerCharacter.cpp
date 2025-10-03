@@ -35,6 +35,7 @@ void ATPlayerCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	SetupAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void ATPlayerCharacter::OnRep_PlayerState()

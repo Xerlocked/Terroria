@@ -47,3 +47,11 @@ void ATCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(VitalAttributes, 1.0f);
 }
 
+void ATCharacterBase::AddCharacterAbilities()
+{
+	UTAbilitySystemComponent* TASC = CastChecked<UTAbilitySystemComponent>(AbilitySystemComponent.Get());
+	if (!HasAuthority()) return;
+
+	TASC->AddCharacterAbilities(StartupAbilities);
+}
+

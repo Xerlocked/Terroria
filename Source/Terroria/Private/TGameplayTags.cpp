@@ -82,4 +82,33 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attribute_Secondary_MovementSpeed = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Attribute.Secondary.MovementSpeed"),
 			FString("600"));
+
+	// Input Action Tags
+	GameplayTags.Input_Mouse_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Mouse.LMB"),
+			FString("Left Mouse Button"));
+	
+	GameplayTags.Input_Mouse_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Mouse.RMB"),
+			FString("Right Mouse Button"));
+	
+	GameplayTags.Input_Keyboard_Q = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Keyboard.Q"),
+			FString("Keyboard Q"));
+	
+	GameplayTags.Input_Keyboard_W = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Keyboard.W"),
+			FString("Keyboard W"));
+	
+	GameplayTags.Input_Keyboard_E = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Keyboard.E"),
+			FString("Keyboard E"));
+	
+	GameplayTags.Input_Keyboard_R = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Keyboard.R"),
+			FString("Keyboard R"));
+	
+	GameplayTags.Input_Keyboard_Space = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Keyboard.Space"),
+			FString("Keyboard Space bar"));
 }

@@ -35,6 +35,15 @@ public:
 	FGameplayTag Attribute_Secondary_BlockChance;
 	FGameplayTag Attribute_Secondary_MovementSpeed;
 
+
+	FGameplayTag Input_Mouse_LMB;
+	FGameplayTag Input_Mouse_RMB;
+	FGameplayTag Input_Keyboard_Q;
+	FGameplayTag Input_Keyboard_W;
+	FGameplayTag Input_Keyboard_E;
+	FGameplayTag Input_Keyboard_R;
+	FGameplayTag Input_Keyboard_Space;
+	
 private:
 	static FTGameplayTags GameplayTags;
 };
