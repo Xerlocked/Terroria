@@ -116,8 +116,11 @@ void ATPlayerController::DoWheel(const FInputActionValue& Value)
 	}
 }
 
-void ATPlayerController::PressedAbilityAction(FGameplayTag Tag)
+void ATPlayerController::PressedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag)
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("PressedAbilityAction: %s"), *Tag.ToString());
+	
 	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
 		bIsTargeting = CurrentActor ? true : false;
@@ -125,7 +128,7 @@ void ATPlayerController::PressedAbilityAction(FGameplayTag Tag)
 	}
 }
 
-void ATPlayerController::ReleasedAbilityAction(const FGameplayTag Tag)
+void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, const FGameplayTag Tag)
 {
 	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
@@ -140,11 +143,11 @@ void ATPlayerController::ReleasedAbilityAction(const FGameplayTag Tag)
 
 	if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, PossessedCharacter->GetActorLocation(), CachedDestination))
 	{
+		RouteSpline->ClearSplinePoints();
+		
 		for (const FVector& PathPoint : NavPath->PathPoints)
 		{
-			RouteSpline->ClearSplinePoints();
 			RouteSpline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
-
 			DrawDebugSphere(GetWorld(), PathPoint, 5.0f, 12, FColor::Blue, false, 3.0f);
 		}
 		CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];

@@ -53,7 +53,7 @@ void UTAbilitySystemComponent::ReleaseAbilityInputTag(const FGameplayTag& InputT
 	}
 }
 
-void UTAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
+void UTAbilitySystemComponent::EffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
                                              const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const
 {
 	FGameplayTagContainer TagContainer;

@@ -57,9 +57,9 @@ private:
 
 	void DoWheel(const FInputActionValue& Value);
 	
-	void PressedAbilityAction(FGameplayTag Tag);
+	void PressedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 
-	void ReleasedAbilityAction(FGameplayTag Tag);
+	void ReleasedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 
 	void HeldAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 	
@@ -87,7 +87,8 @@ private:
 	float MousePressTime = 0.f;
 
 	/** Threshold for minimum required time for a pressed reaction */
-	float MinPressedThreshold = 0.2f;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	float MinPressedThreshold = 0.02f;
 
 	/** Arrival tolerance radius */
 	float StopMovementRadius = 50.f;

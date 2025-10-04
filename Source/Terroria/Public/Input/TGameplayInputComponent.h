@@ -18,9 +18,6 @@ public:
 
 	template <class T, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 	void BindAbilityActions(const UTGameplayInput* InputContext, T* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
-
-	template <class T, typename AxisFuncType>
-	void BindAxisActions(const UTGameplayInput* InputContext, T* Object, AxisFuncType AxisFunc);
 };
 
 template <class T, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
@@ -49,21 +46,4 @@ void UTGameplayInputComponent::BindAbilityActions(const UTGameplayInput* InputCo
 			}
 		}
 	}
-}
-
-template <class T, typename AxisFuncType>
-void UTGameplayInputComponent::BindAxisActions(const UTGameplayInput* InputContext, T* Object, AxisFuncType AxisFunc)
-{
-	check(InputContext);
-
-	// for (const FGameplayInputAction& Action : InputContext->AbilityInputActions)
-	// {
-	// 	if (Action.InputAction && Action.InputTags.IsValid() && Action.bAxisAction)
-	// 	{
-	// 		if (AxisFunc)
-	// 		{
-	// 			BindAction(Action.InputAction, ETriggerEvent::Started, Object, AxisFunc, CurrentValue, Action.InputTags);
-	// 		}
-	// 	}
-	// }
 }
