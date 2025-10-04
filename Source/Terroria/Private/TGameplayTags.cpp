@@ -91,6 +91,10 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Input_Mouse_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Input.Mouse.RMB"),
 			FString("Right Mouse Button"));
+
+	GameplayTags.Input_Mouse_Wheel = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Input.Mouse.Wheel"),
+			FString("Mouse Wheel"));
 	
 	GameplayTags.Input_Keyboard_Q = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Input.Keyboard.Q"),

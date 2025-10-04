@@ -3,17 +3,20 @@
 
 #include "Public/Player/TPlayerController.h"
 
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
-#include "NiagaraFunctionLibrary.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "TGameplayTags.h"
 #include "Character/TPlayerCharacter.h"
+#include "Components/SplineComponent.h"
+#include "Input/TGameplayInputComponent.h"
 #include "Interface/Highlight.h"
 
 ATPlayerController::ATPlayerController()
 {
 	ZoomDelta = 50.f;
+	RouteSpline = CreateDefaultSubobject<USplineComponent>("RouteSpline");
 }
 
 void ATPlayerController::BeginPlay()
@@ -28,6 +31,52 @@ void ATPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	TraceCursor();
+	MovePlayerToDestination();
+}
+
+void ATPlayerController::TraceCursor()
+{
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorTraceHit);
+
+	if (!CursorTraceHit.bBlockingHit)
+	{
+		return;
+	}
+	
+	LastActor = CurrentActor;
+	CurrentActor = CursorTraceHit.GetActor();
+
+	if (LastActor != CurrentActor)
+	{
+		if (LastActor)
+		{
+			LastActor->DeactiveHighlightActor();
+		}
+
+		if (CurrentActor)
+		{
+			CurrentActor->ActiveHighlightActor();
+		}
+	}
+}
+
+void ATPlayerController::MovePlayerToDestination()
+{
+	if (!bMovingToDestination) return;
+
+	if (PossessedCharacter)
+	{
+		const FVector LocationOnSpline = RouteSpline->FindLocationClosestToWorldLocation(PossessedCharacter->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector WorldDirection = RouteSpline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+
+		PossessedCharacter->AddMovementInput(WorldDirection);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= StopMovementRadius)
+		{
+			bMovingToDestination = false;
+		}
+	}
 }
 
 void ATPlayerController::SetupInputComponent()
@@ -44,16 +93,9 @@ void ATPlayerController::SetupInputComponent()
 			}
 		}
 
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+		if (UTGameplayInputComponent* GameplayInputComponent = Cast<UTGameplayInputComponent>(InputComponent))
 		{
-			// Mouse Click
-			EnhancedInputComponent->BindAction(DestClickAction, ETriggerEvent::Started, this, &ATPlayerController::DoClickStart);
-
-			// Mouse Wheel Scroll
-			EnhancedInputComponent->BindAction(WheelAction, ETriggerEvent::Triggered, this, &ATPlayerController::DoWheel);
-
-			// Press Spacebar
-			EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATPlayerController::DoDash);
+			GameplayInputComponent->BindAbilityActions(InputContext, this, &ThisClass::PressedAbilityAction, &ThisClass::ReleasedAbilityAction, &ThisClass::HeldAbilityAction);
 		}
 	}
 }
@@ -65,27 +107,6 @@ void ATPlayerController::OnPossess(APawn* InPawn)
 	PossessedCharacter = Cast<ATPlayerCharacter>(InPawn);
 }
 
-void ATPlayerController::DoClickStart()
-{
-	FHitResult Hit;
-	GetHitResultUnderCursorByChannel(TraceTypeQuery1, true, Hit);
-
-	if (!Hit.bBlockingHit)
-	{
-		return;
-	}
-
-	// Align character direction
-	FVector Direction = GetPawn()->GetActorLocation() - Hit.Location;
-	GetPawn()->AddMovementInput(Direction.GetSafeNormal());
-
-	// Move to target position
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hit.Location);
-
-	// Spawn click particle
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FXCursor, Hit.Location);
-}
-
 void ATPlayerController::DoWheel(const FInputActionValue& Value)
 {
 	FVector WheelDelta = Value.Get<FVector>();
@@ -95,53 +116,90 @@ void ATPlayerController::DoWheel(const FInputActionValue& Value)
 	}
 }
 
-void ATPlayerController::DoDash()
+void ATPlayerController::PressedAbilityAction(FGameplayTag Tag)
 {
-	// Dash
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
+	{
+		bIsTargeting = CurrentActor ? true : false;
+		bMovingToDestination = false;
+	}
 }
 
-void ATPlayerController::TraceCursor()
+void ATPlayerController::ReleasedAbilityAction(const FGameplayTag Tag)
 {
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (!Hit.bBlockingHit)
+	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
+		if (GetTASC())
+		{
+			GetTASC()->HeldAbilityInputTag(Tag);
+		}
+		return;
+	}
+
+	if (MousePressTime < MinPressedThreshold) return;
+
+	if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, PossessedCharacter->GetActorLocation(), CachedDestination))
+	{
+		for (const FVector& PathPoint : NavPath->PathPoints)
+		{
+			RouteSpline->ClearSplinePoints();
+			RouteSpline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
+
+			DrawDebugSphere(GetWorld(), PathPoint, 5.0f, 12, FColor::Blue, false, 3.0f);
+		}
+		CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+		bMovingToDestination = true;
+	}
+}
+
+void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const FGameplayTag Tag)
+{
+
+	// Todo: To make GA.
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_Wheel))
+	{
+		DoWheel(Value);
 		return;
 	}
 	
-	LastActor = CurrentActor;
-	CurrentActor = Hit.GetActor();
-
-	if (Hit.GetActor() != nullptr)
+	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
+		if (GetTASC())
+		{
+			GetTASC()->HeldAbilityInputTag(Tag);
+		}
+		return;
 	}
 
-	
-	if (LastActor == nullptr)
+	if (bIsTargeting)
 	{
-		if (CurrentActor != nullptr)
+		if (GetTASC())
 		{
-			// Scenario B.
-			CurrentActor->ActiveHighlightActor();
+			GetTASC()->HeldAbilityInputTag(Tag);
 		}
 	}
 	else
 	{
-		if (CurrentActor == nullptr)
+		MousePressTime += GetWorld()->GetDeltaSeconds();
+
+		if (CursorTraceHit.bBlockingHit)
 		{
-			// Scenario C.
-			LastActor->DeactiveHighlightActor();
+			CachedDestination = CursorTraceHit.ImpactPoint;
 		}
-		else
+
+		if (PossessedCharacter)
 		{
-			if (LastActor != CurrentActor)
-			{
-				// Scenario D.
-				LastActor->DeactiveHighlightActor();
-				CurrentActor->ActiveHighlightActor();
-			}
+			const FVector WorldDirection = (CachedDestination - PossessedCharacter->GetActorLocation()).GetSafeNormal();
+			PossessedCharacter->AddMovementInput(WorldDirection);
 		}
 	}
+}
+
+UTAbilitySystemComponent* ATPlayerController::GetTASC()
+{
+	if (TAbilitySystemComponent == nullptr)
+	{
+		TAbilitySystemComponent = Cast<UTAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return TAbilitySystemComponent;
 }

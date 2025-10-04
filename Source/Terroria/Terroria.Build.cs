@@ -22,7 +22,8 @@ public class Terroria : ModuleRules
 			"GameplayTasks",
 			"GameplayTags",
 			"GameplayAbilities",
-			"Niagara"
+			"Niagara",
+			"NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

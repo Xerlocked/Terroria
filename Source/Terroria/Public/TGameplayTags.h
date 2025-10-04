@@ -38,6 +38,7 @@ public:
 
 	FGameplayTag Input_Mouse_LMB;
 	FGameplayTag Input_Mouse_RMB;
+	FGameplayTag Input_Mouse_Wheel;
 	FGameplayTag Input_Keyboard_Q;
 	FGameplayTag Input_Keyboard_W;
 	FGameplayTag Input_Keyboard_E;

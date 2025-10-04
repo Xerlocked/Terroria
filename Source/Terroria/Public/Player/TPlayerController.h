@@ -3,9 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/PlayerController.h"
+#include "GameplayTagContainer.h"
+#include "AbilitySystem/TAbilitySystemComponent.h"
 #include "TPlayerController.generated.h"
 
+class USplineComponent;
+class UTAbilitySystemComponent;
+class UTGameplayInput;
 class IHighlight;
 class ATPlayerCharacter;
 struct FInputActionValue;
@@ -34,34 +40,69 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Input|Input Mappings")
 	TArray<UInputMappingContext*> MappingContexts;
-
-	UPROPERTY(EditAnywhere, Category="Input|Actions")
-	UInputAction* DestClickAction;
-
-	UPROPERTY(EditAnywhere, Category="Input|Actions")
-	UInputAction* WheelAction;
-
-	UPROPERTY(EditAnywhere, Category="Input|Actions")
-	UInputAction* DashAction;
 	
 	UPROPERTY(EditAnywhere, Category="Effect")
 	UNiagaraSystem* FXCursor;
 
 	UPROPERTY(EditAnywhere, Category="Game|Properties")
 	float ZoomDelta;
+
+	UPROPERTY(VisibleAnywhere)
+	USplineComponent* RouteSpline;
 	
 private:
-	void DoClickStart();
+	void TraceCursor();
+	
+	void MovePlayerToDestination();
 
 	void DoWheel(const FInputActionValue& Value);
+	
+	void PressedAbilityAction(FGameplayTag Tag);
 
-	void DoDash();
+	void ReleasedAbilityAction(FGameplayTag Tag);
 
-	void TraceCursor();
+	void HeldAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 	
 	UPROPERTY()
 	TObjectPtr<ATPlayerCharacter> PossessedCharacter;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UTGameplayInput> InputContext;
+	
+	UPROPERTY()
+	TObjectPtr<UTAbilitySystemComponent> TAbilitySystemComponent;
+
+	FHitResult CursorTraceHit;
+	
+	// ~Begin Highlight
 	TScriptInterface<IHighlight> LastActor;
 	TScriptInterface<IHighlight> CurrentActor;
-};	
+	// ~End Highlight
+	
+	// ~Begin Click to Move
+	/** Cached location, Spline, or last clicked location. */
+	FVector CachedDestination;
+
+	/** Mouse press time */
+	float MousePressTime = 0.f;
+
+	/** Threshold for minimum required time for a pressed reaction */
+	float MinPressedThreshold = 0.2f;
+
+	/** Arrival tolerance radius */
+	float StopMovementRadius = 50.f;
+
+	/** Moving to current destination */
+	uint8 bMovingToDestination: 1;
+
+	/** if true, target selected */
+	uint8 bIsTargeting: 1;
+	// ~End Click to Move
+
+private:
+	/**
+	 * Returns the controller's TAbilitySystemComponent.
+	 * @return UTAbilitySystemComponent;
+	 */
+	UTAbilitySystemComponent* GetTASC();
+};
