@@ -31,6 +31,8 @@ public:
 
 	virtual int32 GetPlayerLevel() const override;
 
+	virtual FVector GetWeaponSocketLocation() const override;
+
 private:
 	virtual void SetupAbilityActorInfo() override;
 	

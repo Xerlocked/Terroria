@@ -3,6 +3,7 @@
 
 #include "TAssetManager.h"
 
+#include "AbilitySystemGlobals.h"
 #include "TGameplayTags.h"
 
 UTAssetManager& UTAssetManager::Get()
@@ -16,4 +17,6 @@ void UTAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FTGameplayTags::InitializeNativeGameplayTags();
+
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

@@ -1,0 +1,30 @@
+// Copyright 2025 @xerlock. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "CharacterData.generated.h"
+
+// This class does not need to be modified.
+UINTERFACE(MinimalAPI, BlueprintType)
+class UCharacterData : public UInterface
+{
+	GENERATED_BODY()
+};
+
+/**
+ * 
+ */
+class TERRORIA_API ICharacterData
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual FVector GetWeaponSocketLocation() const;
+
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateFacingTarget(const FVector& TargetLocation);
+};

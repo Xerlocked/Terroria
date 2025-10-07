@@ -32,6 +32,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void PlayerTick(float DeltaTime) override;
+
+	virtual void OnRep_Pawn() override;
 	
 protected:
 	virtual void SetupInputComponent() override;
@@ -88,7 +90,7 @@ private:
 
 	/** Threshold for minimum required time for a pressed reaction */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	float MinPressedThreshold = 0.02f;
+	float MinPressedThreshold = 0.5f;
 
 	/** Arrival tolerance radius */
 	float StopMovementRadius = 50.f;

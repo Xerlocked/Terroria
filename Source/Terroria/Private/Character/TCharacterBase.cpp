@@ -4,6 +4,7 @@
 #include "Character/TCharacterBase.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAttributeSet.h"
+#include "Components/CapsuleComponent.h"
 
 ATCharacterBase::ATCharacterBase()
 {
@@ -12,6 +13,9 @@ ATCharacterBase::ATCharacterBase()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	AttributeSet = CreateDefaultSubobject<UTAttributeSet>(TEXT("AttributeSet"));
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 UAbilitySystemComponent* ATCharacterBase::GetAbilitySystemComponent() const

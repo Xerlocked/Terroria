@@ -23,6 +23,14 @@ void ATPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		for (UInputMappingContext* CurrentContext : MappingContexts)
+		{
+			Subsystem->AddMappingContext(CurrentContext, 0);
+		}
+	}
+	
 	SetShowMouseCursor(true);
 }
 
@@ -32,6 +40,16 @@ void ATPlayerController::PlayerTick(float DeltaTime)
 
 	TraceCursor();
 	MovePlayerToDestination();
+}
+
+void ATPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+
+	if (IsLocalController())
+	{
+		PossessedCharacter = Cast<ATPlayerCharacter>(GetPawn());
+	}
 }
 
 void ATPlayerController::TraceCursor()
@@ -82,22 +100,12 @@ void ATPlayerController::MovePlayerToDestination()
 void ATPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
-	if (IsLocalPlayerController())
+	
+	if (UTGameplayInputComponent* GameplayInputComponent = Cast<UTGameplayInputComponent>(InputComponent))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-		{
-			for (UInputMappingContext* CurrentContext : MappingContexts)
-			{
-				Subsystem->AddMappingContext(CurrentContext, 0);
-			}
-		}
-
-		if (UTGameplayInputComponent* GameplayInputComponent = Cast<UTGameplayInputComponent>(InputComponent))
-		{
-			GameplayInputComponent->BindAbilityActions(InputContext, this, &ThisClass::PressedAbilityAction, &ThisClass::ReleasedAbilityAction, &ThisClass::HeldAbilityAction);
-		}
+		GameplayInputComponent->BindAbilityActions(InputContext, this, &ThisClass::PressedAbilityAction, &ThisClass::ReleasedAbilityAction, &ThisClass::HeldAbilityAction);
 	}
+	
 }
 
 void ATPlayerController::OnPossess(APawn* InPawn)
@@ -118,9 +126,6 @@ void ATPlayerController::DoWheel(const FInputActionValue& Value)
 
 void ATPlayerController::PressedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag)
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("PressedAbilityAction: %s"), *Tag.ToString());
-	
 	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
 		bIsTargeting = CurrentActor ? true : false;
@@ -139,19 +144,23 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 		return;
 	}
 
-	if (MousePressTime < MinPressedThreshold) return;
-
-	if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, PossessedCharacter->GetActorLocation(), CachedDestination))
+	if (MousePressTime <= MinPressedThreshold && PossessedCharacter)
 	{
-		RouteSpline->ClearSplinePoints();
-		
-		for (const FVector& PathPoint : NavPath->PathPoints)
+		if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, PossessedCharacter->GetActorLocation(), CachedDestination))
 		{
-			RouteSpline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
-			DrawDebugSphere(GetWorld(), PathPoint, 5.0f, 12, FColor::Blue, false, 3.0f);
+			RouteSpline->ClearSplinePoints();
+			
+			for (const FVector& PathPoint : NavPath->PathPoints)
+			{
+				RouteSpline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
+				DrawDebugSphere(GetWorld(), PathPoint, 5.0f, 12, FColor::Blue, false, 3.0f);
+			}
+			CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+			bMovingToDestination = true;
 		}
-		CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
-		bMovingToDestination = true;
+
+		MousePressTime = 0.f;
+		bIsTargeting = false;
 	}
 }
 

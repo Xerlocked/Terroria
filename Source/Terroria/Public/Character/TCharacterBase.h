@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interface/CharacterData.h"
 #include "Interface/StatusInterface.h"
 #include "TCharacterBase.generated.h"
 
@@ -14,7 +15,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS(Abstract)
-class TERRORIA_API ATCharacterBase : public ACharacter, public IAbilitySystemInterface, public IStatusInterface
+class TERRORIA_API ATCharacterBase : public ACharacter, public IAbilitySystemInterface, public IStatusInterface, public ICharacterData
 {
 	GENERATED_BODY()
 
@@ -50,7 +51,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Attributes")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName WeaponSocketName;
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "GAS|Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;

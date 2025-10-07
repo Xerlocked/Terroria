@@ -53,6 +53,11 @@ int32 ATPlayerCharacter::GetPlayerLevel() const
 	return TPlayerState->GetPlayerLevel();
 }
 
+FVector ATPlayerCharacter::GetWeaponSocketLocation() const
+{
+	return GetMesh()->GetSocketLocation(WeaponSocketName);
+}
+
 void ATPlayerCharacter::SetupAbilityActorInfo()
 {
 	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
