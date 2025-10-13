@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/Abilities/TProjectileAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Actor/TBaseProjectile.h"
 #include "Interface/CharacterData.h"
 
@@ -36,7 +38,9 @@ void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
 		ATBaseProjectile* Projectile = GetWorld()->SpawnActorDeferred<ATBaseProjectile>(ProjectileClass,
 			ProjectileTransform, GetOwningActorFromActorInfo(), Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		// cause damage by gameplay effect.
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(ProjectileTransform);
 	}

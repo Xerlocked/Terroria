@@ -7,6 +7,7 @@
 #include "TProjectileAbility.generated.h"
 
 class ATBaseProjectile;
+class UGameplayEffect;
 /**
  * 
  */
@@ -24,4 +25,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<ATBaseProjectile> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;;
 };

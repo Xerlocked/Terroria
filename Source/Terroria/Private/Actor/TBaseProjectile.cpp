@@ -3,6 +3,9 @@
 
 #include "Actor/TBaseProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Terroria.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -13,6 +16,7 @@ ATBaseProjectile::ATBaseProjectile()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SetRootComponent(SphereComponent);
+	SphereComponent->SetCollisionObjectType(ECC_Projectile);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SphereComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
@@ -28,13 +32,37 @@ ATBaseProjectile::ATBaseProjectile()
 void ATBaseProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SetLifeSpan(LifeSpan);
 
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ATBaseProjectile::OnSphereOverlap);
 }
 
+void ATBaseProjectile::Destroyed()
+{
+	if (!bHit && !HasAuthority())
+	{
+		// Client fx effect destroyed.
+	}
+	
+	Super::Destroyed();
+}
+
+
 void ATBaseProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
+	if (HasAuthority())
+	{
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		
+		Destroy();
+	}
+	else
+	{
+		bHit = true;
+	}
 }
 

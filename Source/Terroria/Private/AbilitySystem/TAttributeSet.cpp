@@ -79,6 +79,8 @@ void UTAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 	if (Attribute == GetManaAttribute())
 	{
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
+		
+		UE_LOG(LogTemp, Log, TEXT("Health value %f"), NewValue);
 	}
 }
 
@@ -116,13 +118,23 @@ void UTAttributeSet::GetGameplayEffectProperty(const FGameplayEffectModCallbackD
 	}
 }
 
-
 void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 
 	FEffectProperty EffectProperty;
 	GetGameplayEffectProperty(Data, EffectProperty);
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *EffectProperty.TargetAvatarActor->GetName(), GetHealth());
+	}
+
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
 }
 
 void UTAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldValue) const
