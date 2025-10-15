@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TCharacterBase.h"
+#include "AbilitySystem/Data/TCharacterClassDataAsset.h"
 #include "Interface/Highlight.h"
 #include "UI/WidgetController/TOverlayWidgetController.h"
 #include "TEnemyCharacter.generated.h"
@@ -30,8 +31,13 @@ public:
 protected:
 	virtual void SetupAbilityActorInfo() override;
 
+	virtual void InitializeDefaultAttributes() const override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Class")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UWidgetComponent> HealthWidget;

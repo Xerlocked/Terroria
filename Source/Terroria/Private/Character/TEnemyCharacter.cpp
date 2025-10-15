@@ -4,6 +4,7 @@
 
 #include "Terroria.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
+#include "AbilitySystem/TAbilitySystemLibrary.h"
 #include "AbilitySystem/TAttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Widget/TUserWidget.h"
@@ -78,4 +79,9 @@ void ATEnemyCharacter::SetupAbilityActorInfo()
 	
 	
 	InitializeDefaultAttributes();
+}
+
+void ATEnemyCharacter::InitializeDefaultAttributes() const
+{
+	UTAbilitySystemLibrary::InitializedDefaultAttributes(this, CharacterClass, 1.0f, AbilitySystemComponent);
 }

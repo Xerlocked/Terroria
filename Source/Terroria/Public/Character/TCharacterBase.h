@@ -31,10 +31,10 @@ public:
 protected:
 	virtual void SetupAbilityActorInfo();
 
+	virtual void InitializeDefaultAttributes() const;
+
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass, float Level) const;
 	
-	void InitializeDefaultAttributes() const;
-
 	void AddCharacterAbilities();
 	
 	UPROPERTY()

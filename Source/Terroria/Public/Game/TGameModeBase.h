@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "TGameModeBase.generated.h"
 
+class UTCharacterClassDataAsset;
 /**
  * 
  */
@@ -14,4 +15,7 @@ class TERRORIA_API ATGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
+	TObjectPtr<UTCharacterClassDataAsset> CharacterClassInfo;
 };
