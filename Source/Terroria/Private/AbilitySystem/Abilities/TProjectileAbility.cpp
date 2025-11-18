@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "TGameplayTags.h"
 #include "Actor/TBaseProjectile.h"
 #include "Interface/CharacterData.h"
 
@@ -13,10 +14,6 @@ void UTProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
                                           const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	
-
-
 }
 
 void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
@@ -40,6 +37,9 @@ void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
 
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		const FTGameplayTags& GameplayTags = FTGameplayTags::Get();
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, 50.f);
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(ProjectileTransform);

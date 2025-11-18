@@ -44,6 +44,10 @@ public:
 	FGameplayTag Input_Keyboard_E;
 	FGameplayTag Input_Keyboard_R;
 	FGameplayTag Input_Keyboard_Space;
+
+	FGameplayTag Damage;
+
+	FGameplayTag Effects_HitReact;
 	
 private:
 	static FTGameplayTags GameplayTags;

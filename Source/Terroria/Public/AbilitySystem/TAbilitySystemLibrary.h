@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AbilitySystemLibrary|CharacterClass")
 	static void InitializedDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category = "AbilitySystemLibrary|CharacterClass")
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 };

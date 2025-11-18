@@ -3,10 +3,13 @@
 #include "Character/TEnemyCharacter.h"
 
 #include "Terroria.h"
+#include "TGameplayTags.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAbilitySystemLibrary.h"
 #include "AbilitySystem/TAttributeSet.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "UI/Widget/TUserWidget.h"
 
 ATEnemyCharacter::ATEnemyCharacter()
@@ -26,8 +29,9 @@ ATEnemyCharacter::ATEnemyCharacter()
 void ATEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	SetupAbilityActorInfo();
+	UTAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 	
 	if (UTUserWidget* TUserWidget = Cast<UTUserWidget>(HealthWidget->GetUserWidgetObject()))
 	{
@@ -50,6 +54,8 @@ void ATEnemyCharacter::BeginPlay()
 			}
 		);
 
+		AbilitySystemComponent->RegisterGameplayTagEvent(FTGameplayTags::Get().Effects_HitReact).AddUObject(this, &ThisClass::OnHitReactTagChanged);
+
 		OnHealthChanged.Broadcast(TAttributes->GetHealth());
 		OnMaxHealthChanged.Broadcast(TAttributes->GetMaxHealth());
 	}
@@ -69,6 +75,12 @@ void ATEnemyCharacter::DeactiveHighlightActor()
 int32 ATEnemyCharacter::GetPlayerLevel() const
 {
 	return Level;
+}
+
+void ATEnemyCharacter::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReact = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReact ? 0.f : BaseWalkSpeed;
 }
 
 void ATEnemyCharacter::SetupAbilityActorInfo()

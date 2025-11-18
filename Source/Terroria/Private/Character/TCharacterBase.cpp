@@ -24,6 +24,11 @@ int32 ATCharacterBase::GetPlayerLevel() const
 	return 0;
 }
 
+UAnimMontage* ATCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
 void ATCharacterBase::SetupAbilityActorInfo()
 {
 	

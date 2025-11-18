@@ -115,4 +115,13 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Input_Keyboard_Space = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Input.Keyboard.Space"),
 			FString("Keyboard Space bar"));
+
+	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage"),
+		FString("Damage"));
+
+	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+			FName("Effects.HitReact"),
+			FString("Effects HitReact"));
+	
 }

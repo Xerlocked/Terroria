@@ -180,6 +180,14 @@ public:
 
 	//~ End Unique Attributes
 
+	//~ Begin Meta Attributes
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, IncomingDamage);
+	
+	//~ End Meat Attributes
+
 	UFUNCTION()
 	void OnRep_Strength(const FGameplayAttributeData& OldValue) const;
 

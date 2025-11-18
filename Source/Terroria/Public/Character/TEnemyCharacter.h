@@ -28,6 +28,13 @@ public:
 
 	virtual int32 GetPlayerLevel() const override;
 
+	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character|Combat")
+	bool bHitReact = false;
+
+	float BaseWalkSpeed = 250.f;
+	
 protected:
 	virtual void SetupAbilityActorInfo() override;
 

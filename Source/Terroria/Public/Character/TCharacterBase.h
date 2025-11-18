@@ -13,6 +13,7 @@ class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UAnimMontage;
 
 UCLASS(Abstract)
 class TERRORIA_API ATCharacterBase : public ACharacter, public IAbilitySystemInterface, public IStatusInterface, public ICharacterData
@@ -27,6 +28,8 @@ public:
 	virtual int32 GetPlayerLevel() const override;
 	
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
+
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	
 protected:
 	virtual void SetupAbilityActorInfo();
@@ -58,4 +61,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "GAS|Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Anim|Montage")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };
