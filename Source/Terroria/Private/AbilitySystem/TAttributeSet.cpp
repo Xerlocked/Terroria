@@ -6,6 +6,7 @@
 #include "TGameplayTags.h"
 #include "AbilitySystem/Data/TAttributeDataAsset.h"
 #include "GameFramework/Character.h"
+#include "Interface/CharacterData.h"
 #include "Net/UnrealNetwork.h"
 
 UTAttributeSet::UTAttributeSet()
@@ -24,11 +25,8 @@ UTAttributeSet::UTAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_AttackPower, GetAttackPowerAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_Armor, GetArmorAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_AttackSpeed, GetAttackSpeedAttribute);
-	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_BlockChance, GetBlockChanceAttribute);
-	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_CastSpeed, GetCastSpeedAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_CriticalHitChance, GetCriticalHitChanceAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_CriticalHitDamage, GetCriticalHitDamageAttribute);
-	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_HealthDrain, GetHealthDrainAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_HealthRegeneration, GetHealthRegenerationAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_MagicPower, GetMagicPowerAttribute);
 	TagsToAttributes.Add(GameplayTags.Attribute_Secondary_ManaRegeneration, GetManaRegenerationAttribute);
@@ -56,14 +54,11 @@ void UTAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, AttackPower, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, MagicPower, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, AttackSpeed, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, CastSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, HealthDrain, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, Armor, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UTAttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
 	
 }
 
@@ -146,8 +141,14 @@ void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCa
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0.f;
-
-			if (!bFatal)
+			if (bFatal)
+			{
+				if (ICharacterData* CharacterData = Cast<ICharacterData>(EffectProperty.TargetAvatarActor))
+				{
+					CharacterData->Die();
+				}
+			}
+			else
 			{
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(FTGameplayTags::Get().Effects_HitReact);
@@ -190,11 +191,6 @@ void UTAttributeSet::OnRep_MagicPower(const FGameplayAttributeData& OldValue) co
 void UTAttributeSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, AttackSpeed, OldValue);
-}
-
-void UTAttributeSet::OnRep_CastSpeed(const FGameplayAttributeData& OldValue) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, CastSpeed, OldValue);
 }
 
 void UTAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldValue) const
@@ -242,17 +238,7 @@ void UTAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& OldVal
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, ManaRegeneration, OldValue);
 }
 
-void UTAttributeSet::OnRep_HealthDrain(const FGameplayAttributeData& OldValue) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, HealthDrain, OldValue);
-}
-
 void UTAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, Armor, OldValue);
-}
-
-void UTAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldValue) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UTAttributeSet, BlockChance, OldValue);
 }

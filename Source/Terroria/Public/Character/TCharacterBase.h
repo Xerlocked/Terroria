@@ -30,6 +30,11 @@ public:
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
 
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+
+	virtual void Die() override;
+
+	UFUNCTION(NetMulticast, reliable)
+	virtual void MulticastDeath();
 	
 protected:
 	virtual void SetupAbilityActorInfo();

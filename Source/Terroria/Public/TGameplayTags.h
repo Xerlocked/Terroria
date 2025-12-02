@@ -23,16 +23,13 @@ public:
 	FGameplayTag Attribute_Secondary_AttackPower;
 	FGameplayTag Attribute_Secondary_MagicPower;
 	FGameplayTag Attribute_Secondary_AttackSpeed;
-	FGameplayTag Attribute_Secondary_CastSpeed;
 	FGameplayTag Attribute_Secondary_CriticalHitChance;
 	FGameplayTag Attribute_Secondary_CriticalHitDamage;
 	FGameplayTag Attribute_Secondary_MaxHealth;
 	FGameplayTag Attribute_Secondary_MaxMana;
 	FGameplayTag Attribute_Secondary_HealthRegeneration;
 	FGameplayTag Attribute_Secondary_ManaRegeneration;
-	FGameplayTag Attribute_Secondary_HealthDrain;
 	FGameplayTag Attribute_Secondary_Armor;
-	FGameplayTag Attribute_Secondary_BlockChance;
 	FGameplayTag Attribute_Secondary_MovementSpeed;
 
 

@@ -29,6 +29,19 @@ UAnimMontage* ATCharacterBase::GetHitReactMontage_Implementation()
 	return HitReactMontage;
 }
 
+void ATCharacterBase::Die()
+{
+	MulticastDeath();
+}
+
+void ATCharacterBase::MulticastDeath_Implementation()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetSimulatePhysics(true);
+}
+
 void ATCharacterBase::SetupAbilityActorInfo()
 {
 	

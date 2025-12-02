@@ -73,7 +73,7 @@ public:
 	FGameplayAttributeData Strength;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Strength)
 
-	/* 민첩: 공격 속도, 시전 속도 */
+	/* 민첩: 공격 속도 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Agility, Category = "Character|Primary")
 	FGameplayAttributeData Agility;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Agility)
@@ -106,11 +106,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_AttackSpeed, Category = "Character|Secondary")
 	FGameplayAttributeData AttackSpeed;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, AttackSpeed)
-
-	/* 시전 속도 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CastSpeed, Category = "Character|Secondary")
-	FGameplayAttributeData CastSpeed;
-	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, CastSpeed)
 
 	/* 치명타율 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CriticalHitChance, Category = "Character|Secondary")
@@ -157,27 +152,15 @@ public:
 	//~ End Vital Attributes
 
 	//~ Begin Unique Attributes
-
 	/* 이동 속도 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed, Category = "Character|Unique")
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, MovementSpeed)
-
-	/* 체력 흡수 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthDrain, Category = "Character|Unique")
-	FGameplayAttributeData HealthDrain;
-	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, HealthDrain)
-
+	
 	/* 방어력 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Armor, Category = "Character|Unique")
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Armor)
-
-	/* 회피율 */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BlockChance, Category = "Character|Unique")
-	FGameplayAttributeData BlockChance;
-	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, BlockChance)
-
 	//~ End Unique Attributes
 
 	//~ Begin Meta Attributes
@@ -213,9 +196,6 @@ public:
 	void OnRep_AttackSpeed(const FGameplayAttributeData& OldValue) const;
 	
 	UFUNCTION()
-	void OnRep_CastSpeed(const FGameplayAttributeData& OldValue) const;
-	
-	UFUNCTION()
 	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue) const;
 	
 	UFUNCTION()
@@ -247,13 +227,7 @@ public:
 	//------------------
 
 	UFUNCTION()
-	void OnRep_HealthDrain(const FGameplayAttributeData& OldValue) const;
-
-	UFUNCTION()
 	void OnRep_Armor(const FGameplayAttributeData& OldValue) const;
-
-	UFUNCTION()
-	void OnRep_BlockChance(const FGameplayAttributeData& OldValue) const;
 
 private:
 	void GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property);

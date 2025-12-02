@@ -22,13 +22,13 @@ class TERRORIA_API ICharacterData
 	GENERATED_BODY()
 
 public:
-
 	virtual FVector GetWeaponSocketLocation() const;
-
-
+	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& TargetLocation);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
+
+	virtual void Die() = 0;
 };

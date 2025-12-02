@@ -83,6 +83,12 @@ void ATEnemyCharacter::OnHitReactTagChanged(const FGameplayTag CallbackTag, int3
 	GetCharacterMovement()->MaxWalkSpeed = bHitReact ? 0.f : BaseWalkSpeed;
 }
 
+void ATEnemyCharacter::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 void ATEnemyCharacter::SetupAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);

@@ -30,10 +30,15 @@ public:
 
 	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
+	virtual void Die() override;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Character|Combat")
 	bool bHitReact = false;
 
 	float BaseWalkSpeed = 250.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
+	float LifeSpan = 5.f;
 	
 protected:
 	virtual void SetupAbilityActorInfo() override;

@@ -39,10 +39,6 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 			FName("Attribute.Secondary.AttackSpeed"),
 			FString("0.6 * (1 + 0.035 * (Level - 1)) * (1 + Agi * 0.005)"));
 	
-	GameplayTags.Attribute_Secondary_CastSpeed = UGameplayTagsManager::Get().AddNativeGameplayTag(
-			FName("Attribute.Secondary.CastSpeed"),
-			FString("0.55 * ( 1 + 0.045 * (Level - 1)) * ( 1 + Agi * 0.005)"));
-	
 	GameplayTags.Attribute_Secondary_CriticalHitChance = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Attribute.Secondary.CriticalHitChance"),
 			FString("(Luk * 0.005)"));
@@ -67,17 +63,9 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 			FName("Attribute.Secondary.ManaRegeneration"),
 			FString("1 + 1.35 * (Level - 1)"));
 	
-	GameplayTags.Attribute_Secondary_HealthDrain = UGameplayTagsManager::Get().AddNativeGameplayTag(
-			FName("Attribute.Secondary.HealthDrain"),
-			FString("Item add"));
-	
 	GameplayTags.Attribute_Secondary_Armor = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Attribute.Secondary.Armor"),
 			FString("33 + 2.5 * (Level - 1)"));
-	
-	GameplayTags.Attribute_Secondary_BlockChance = UGameplayTagsManager::Get().AddNativeGameplayTag(
-			FName("Attribute.Secondary.BlockChance"),
-			FString("Item add"));
 	
 	GameplayTags.Attribute_Secondary_MovementSpeed = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Attribute.Secondary.MovementSpeed"),
