@@ -27,5 +27,5 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FLevelUpInfo> LevelUpsInformation;
 
-	int32 FindLevelForXP(int32 XP);
+	int32 FindLevelForXP(int32 XP) const;
 };

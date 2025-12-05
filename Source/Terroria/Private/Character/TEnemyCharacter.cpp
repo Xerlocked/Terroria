@@ -72,7 +72,7 @@ void ATEnemyCharacter::DeactiveHighlightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 }
 
-int32 ATEnemyCharacter::GetPlayerLevel() const
+int32 ATEnemyCharacter::GetPlayerLevel_Implementation() const
 {
 	return Level;
 }

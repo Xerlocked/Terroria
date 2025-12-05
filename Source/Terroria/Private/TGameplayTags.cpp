@@ -71,6 +71,12 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 			FName("Attribute.Secondary.MovementSpeed"),
 			FString("600"));
 
+	// Meta
+	GameplayTags.Attribute_Meta_IncomingXP = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attribute.Meta.IncomingXP"),
+		FString("IncomingXP"));
+
+	
 	// Input Action Tags
 	GameplayTags.Input_Mouse_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 			FName("Input.Mouse.LMB"),

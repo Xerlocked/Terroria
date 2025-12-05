@@ -5,6 +5,8 @@
 
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAttributeSet.h"
+#include "AbilitySystem/Data/TLevelUpDataAsset.h"
+#include "Player/TPlayerState.h"
 
 void UTOverlayWidgetController::BroadcastInitialValues()
 {
@@ -18,6 +20,16 @@ void UTOverlayWidgetController::BroadcastInitialValues()
 
 void UTOverlayWidgetController::BindCallbacksToDependencies()
 {
+	ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
+	TPlayerState->OnXPChangedDelegate.AddUObject(this, &UTOverlayWidgetController::OnXPChanged);
+
+	TPlayerState->OnLevelChangedDelegate.AddLambda
+	([this](int32 InLevel)
+		{
+			OnPlayerLevelChanged.Broadcast(InLevel);
+		}
+	);
+	
 	const UTAttributeSet* Attributes = CastChecked<UTAttributeSet>(AttributeSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
@@ -55,4 +67,27 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
+}
+
+void UTOverlayWidgetController::OnXPChanged(int32 NewXP) const
+{
+	const ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
+	const UTLevelUpDataAsset* LevelUpInfo = TPlayerState->LevelUpInfo;
+	
+	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out TPlayerState Blueprint"));
+
+	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
+	const int32 MaxLevel = LevelUpInfo->LevelUpsInformation.Num();
+
+	if (Level <= MaxLevel && Level > 0)
+	{
+		const int32 LevelUpRequirement = LevelUpInfo->LevelUpsInformation[Level].LevelUpRequirement;
+		const int32 PreviousLevelUpRequirement = LevelUpInfo->LevelUpsInformation[Level - 1].LevelUpRequirement;
+		const int32 DeltaLevelRequirement = LevelUpRequirement - PreviousLevelUpRequirement;
+		const int32 XPForThisLevel = NewXP - PreviousLevelUpRequirement;
+
+		const float XPBarPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelRequirement);
+
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	}
 }

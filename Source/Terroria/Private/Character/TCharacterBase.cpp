@@ -19,7 +19,7 @@ UAbilitySystemComponent* ATCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent.Get();
 }
 
-int32 ATCharacterBase::GetPlayerLevel() const
+int32 ATCharacterBase::GetPlayerLevel_Implementation() const
 {
 	return 0;
 }
@@ -32,6 +32,11 @@ UAnimMontage* ATCharacterBase::GetHitReactMontage_Implementation()
 void ATCharacterBase::Die()
 {
 	MulticastDeath();
+}
+
+ECharacterClass ATCharacterBase::GetCharacterClass_Implementation() const
+{
+	return CharacterClass;
 }
 
 void ATCharacterBase::MulticastDeath_Implementation()
@@ -71,5 +76,6 @@ void ATCharacterBase::AddCharacterAbilities()
 	if (!HasAuthority()) return;
 
 	TASC->AddCharacterAbilities(StartupAbilities);
+	TASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 

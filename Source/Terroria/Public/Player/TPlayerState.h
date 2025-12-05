@@ -5,15 +5,16 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerState.h"
-#include "Interface/StatusInterface.h"
 #include "TPlayerState.generated.h"
 
+class UTLevelUpDataAsset;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /*StatValue*/)
 
 UCLASS()
-class TERRORIA_API ATPlayerState : public APlayerState, public IAbilitySystemInterface, public IStatusInterface
+class TERRORIA_API ATPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -26,7 +27,21 @@ public:
 
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
 
-	virtual int32 GetPlayerLevel() const override;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTLevelUpDataAsset> LevelUpInfo;
+	
+	FOnPlayerStatChanged OnXPChangedDelegate;
+
+	FOnPlayerStatChanged OnLevelChangedDelegate;
+
+	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
+	FORCEINLINE int32 GetXP() const { return XP; }
+
+	void AddToXP(int32 InXP);
+	void AddToLevel(int32 InLevel);
+	
+	void SetXP(int32 InXP);
+	void SetLevel(int32 InLevel);
 	
 protected:
 	UPROPERTY()
@@ -39,6 +54,12 @@ private:
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_Level, Category = "Character|Status")
 	int32 Level = 1;
 
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_XP, Category = "Character|Status")
+	int32 XP = 0;
+
 	UFUNCTION()
-	void OnRep_Level();
+	void OnRep_Level(int32 OldLevel);
+
+	UFUNCTION()
+	void OnRep_XP(int32 OldXP);
 };

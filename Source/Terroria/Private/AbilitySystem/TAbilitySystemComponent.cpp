@@ -23,6 +23,15 @@ void UTAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UG
 	}
 }
 
+void UTAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
+{
+	for (const TSubclassOf<UGameplayAbility> Ability : Abilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1);
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UTAbilitySystemComponent::HeldAbilityInputTag(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;

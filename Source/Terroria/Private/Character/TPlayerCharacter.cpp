@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
+#include "AbilitySystem/Data/TLevelUpDataAsset.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -28,6 +29,8 @@ ATPlayerCharacter::ATPlayerCharacter()
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(SpringArm);
 	PlayerCamera->FieldOfView = 60.0f;
+
+	CharacterClass = ECharacterClass::Magician;
 }
 
 void ATPlayerCharacter::PossessedBy(AController* NewController)
@@ -45,7 +48,7 @@ void ATPlayerCharacter::OnRep_PlayerState()
 	SetupAbilityActorInfo();
 }
 
-int32 ATPlayerCharacter::GetPlayerLevel() const
+int32 ATPlayerCharacter::GetPlayerLevel_Implementation() const
 {
 	const ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
 	check(TPlayerState);
@@ -56,6 +59,51 @@ int32 ATPlayerCharacter::GetPlayerLevel() const
 FVector ATPlayerCharacter::GetWeaponSocketLocation() const
 {
 	return GetMesh()->GetSocketLocation(WeaponSocketName);
+}
+
+void ATPlayerCharacter::LevelUP_Implementation()
+{
+	
+}
+
+void ATPlayerCharacter::AddToXP_Implementation(int32 NewXP)
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	TPlayerState->AddToXP(NewXP);
+}
+
+void ATPlayerCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	TPlayerState->AddToLevel(InPlayerLevel);
+}
+
+void ATPlayerCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
+{
+	
+}
+
+int32 ATPlayerCharacter::GetXP_Implementation() const
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	return TPlayerState->GetXP();
+}
+
+int32 ATPlayerCharacter::GetAttributePointsReward_Implementation(int32 Level) const
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	return TPlayerState->LevelUpInfo->LevelUpsInformation[Level].AttributePointReward;
+}
+
+int32 ATPlayerCharacter::FindLevelForXP_Implementation(int32 XP) const
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	return TPlayerState->LevelUpInfo->FindLevelForXP(XP);
 }
 
 void ATPlayerCharacter::SetupAbilityActorInfo()

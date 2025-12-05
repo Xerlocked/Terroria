@@ -6,7 +6,6 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Interface/CharacterData.h"
-#include "Interface/StatusInterface.h"
 #include "TCharacterBase.generated.h"
 
 class UGameplayAbility;
@@ -16,7 +15,7 @@ class UAttributeSet;
 class UAnimMontage;
 
 UCLASS(Abstract)
-class TERRORIA_API ATCharacterBase : public ACharacter, public IAbilitySystemInterface, public IStatusInterface, public ICharacterData
+class TERRORIA_API ATCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICharacterData
 {
 	GENERATED_BODY()
 
@@ -25,13 +24,15 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual int32 GetPlayerLevel() const override;
+	virtual int32 GetPlayerLevel_Implementation() const override;
 	
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
 
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 
 	virtual void Die() override;
+
+	virtual ECharacterClass GetCharacterClass_Implementation() const override;
 
 	UFUNCTION(NetMulticast, reliable)
 	virtual void MulticastDeath();
@@ -59,6 +60,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS|Attributes")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Class")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName WeaponSocketName;
@@ -66,6 +70,9 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "GAS|Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "GAS|Abilites")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Anim|Montage")
 	TObjectPtr<UAnimMontage> HitReactMontage;

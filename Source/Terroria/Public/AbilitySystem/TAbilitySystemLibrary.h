@@ -30,4 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AbilitySystemLibrary|CharacterClass")
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+
+	static UTCharacterClassDataAsset* GetCharacterClassDataAsset(const UObject* WorldContextObject);
+
+	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
 };

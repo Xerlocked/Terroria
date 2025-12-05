@@ -2,11 +2,14 @@
 
 
 #include "AbilitySystem/TAttributeSet.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
 #include "TGameplayTags.h"
-#include "AbilitySystem/Data/TAttributeDataAsset.h"
+#include "AbilitySystem/TAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interface/CharacterData.h"
+#include "Interface/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
 
 UTAttributeSet::UTAttributeSet()
@@ -113,6 +116,7 @@ void UTAttributeSet::GetGameplayEffectProperty(const FGameplayEffectModCallbackD
 	}
 }
 
+
 void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
@@ -123,7 +127,6 @@ void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCa
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *EffectProperty.TargetAvatarActor->GetName(), GetHealth());
 	}
 
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
@@ -147,6 +150,7 @@ void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCa
 				{
 					CharacterData->Die();
 				}
+				SendXPEvent(EffectProperty);
 			}
 			else
 			{
@@ -156,7 +160,53 @@ void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCa
 			}
 		}
 	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		const float LocalIncomingXP = GetIncomingXP();
+		SetIncomingXP(0.f);
+
+		if (EffectProperty.InstigatorCharacter->Implements<UPlayerInterface>())
+		{
+			const int32 CurrentLevel = ICharacterData::Execute_GetPlayerLevel(EffectProperty.InstigatorCharacter);
+			const int32 CurrentXP = IPlayerInterface::Execute_GetXP(EffectProperty.InstigatorCharacter);
+			
+			const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(EffectProperty.InstigatorCharacter, CurrentXP + LocalIncomingXP);
+			const int32 NumLevelUps = NewLevel - CurrentLevel;
+			if (NumLevelUps > 0)
+			{
+				const int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(EffectProperty.InstigatorCharacter, CurrentLevel);
+
+				IPlayerInterface::Execute_AddToPlayerLevel(EffectProperty.InstigatorCharacter, NumLevelUps);
+				IPlayerInterface::Execute_AddToAttributePoints(EffectProperty.InstigatorCharacter, AttributePointsReward);
+
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+
+				IPlayerInterface::Execute_LevelUP(EffectProperty.InstigatorCharacter);
+			}
+			
+			IPlayerInterface::Execute_AddToXP(EffectProperty.InstigatorCharacter, LocalIncomingXP);
+		}
+	}
 }
+
+void UTAttributeSet::SendXPEvent(const FEffectProperty& Property)
+{
+	if (Property.TargetCharacter->Implements<UCharacterData>())
+	{
+		const int32 Level = ICharacterData::Execute_GetPlayerLevel(Property.TargetCharacter);
+		ECharacterClass CharacterClass = ICharacterData::Execute_GetCharacterClass(Property.TargetCharacter);
+		const int32 XPReward = UTAbilitySystemLibrary::GetXPRewardForClassAndLevel(Property.TargetCharacter, CharacterClass, Level);
+
+		const FTGameplayTags& GameplayTags = FTGameplayTags::Get();
+		FGameplayEventData Payload;
+		Payload.EventTag = GameplayTags.Attribute_Meta_IncomingXP;
+		Payload.EventMagnitude = XPReward;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Property.InstigatorCharacter, GameplayTags.Attribute_Meta_IncomingXP, Payload);
+	}
+}
+
 
 void UTAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldValue) const
 {

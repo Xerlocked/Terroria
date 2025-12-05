@@ -31,7 +31,8 @@ public:
 	FGameplayTag Attribute_Secondary_ManaRegeneration;
 	FGameplayTag Attribute_Secondary_Armor;
 	FGameplayTag Attribute_Secondary_MovementSpeed;
-
+	
+	FGameplayTag Attribute_Meta_IncomingXP;
 
 	FGameplayTag Input_Mouse_LMB;
 	FGameplayTag Input_Mouse_RMB;
@@ -43,6 +44,7 @@ public:
 	FGameplayTag Input_Keyboard_Space;
 
 	FGameplayTag Damage;
+	
 
 	FGameplayTag Effects_HitReact;
 	

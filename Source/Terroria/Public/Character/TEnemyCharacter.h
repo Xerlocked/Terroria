@@ -26,7 +26,7 @@ public:
 	virtual void DeactiveHighlightActor() override;
 	//~End Highlight interface
 
-	virtual int32 GetPlayerLevel() const override;
+	virtual int32 GetPlayerLevel_Implementation() const override;
 
 	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
@@ -47,9 +47,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	int32 Level = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Class")
-	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UWidgetComponent> HealthWidget;

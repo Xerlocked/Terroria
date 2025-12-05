@@ -24,6 +24,7 @@ struct FWidgetMessageRow : public FTableRowBase
 class UTUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatusChangedSignature, int32, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAssetTagMessageSignature, FWidgetMessageRow, WidgetMessageRow);
 
 /**
@@ -53,10 +54,18 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Message")
 	FOnAssetTagMessageSignature OnAssetTagMessage;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
+	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Level")
+	FOnPlayerStatusChangedSignature OnPlayerLevelChanged;
 	
 protected:
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
+
+	void OnXPChanged(int32 NewXP) const;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|DataTable")
 	TObjectPtr<UDataTable> WidgetMessageDataTable;

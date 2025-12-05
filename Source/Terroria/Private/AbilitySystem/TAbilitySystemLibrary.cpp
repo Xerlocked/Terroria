@@ -4,6 +4,7 @@
 #include "AbilitySystem/TAbilitySystemLibrary.h"
 
 #include "Game/TGameModeBase.h"
+#include "Interface/CharacterData.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/TPlayerState.h"
 #include "UI/HUD/THUD.h"
@@ -45,12 +46,15 @@ UTAttributeMenuWidgetController* UTAbilitySystemLibrary::GetAttributeMenuWidgetC
 
 void UTAbilitySystemLibrary::InitializedDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC)
 {
-	ATGameModeBase* TGameMode = Cast<ATGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (TGameMode == nullptr) return;
-
+	UTCharacterClassDataAsset* CharacterClassDataAsset = GetCharacterClassDataAsset(WorldContextObject);
+	if (CharacterClassDataAsset == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[TAbilitySystemLibrary - 51:46] CharacterClassDataAsset is nullptr"));
+		return;
+	}
+	
 	// Get character class info from gamebase
 	const AActor* Avatar = ASC->GetAvatarActor();
-	UTCharacterClassDataAsset* CharacterClassDataAsset = TGameMode->CharacterClassInfo;
 	FCharacterClassInfo ClassDefaultInfo = CharacterClassDataAsset->GetCharacterClassInfo(CharacterClass);
 
 	// Primary attributes set
@@ -81,7 +85,28 @@ void UTAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObj
 
 	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassDataAsset->CommonAbilities)
 	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		ASC->GiveAbility(AbilitySpec);
+		if (ASC->GetAvatarActor()->Implements<UCharacterData>())
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, ICharacterData::Execute_GetPlayerLevel(ASC->GetAvatarActor()));
+			ASC->GiveAbility(AbilitySpec);
+		}
 	}
+}
+
+UTCharacterClassDataAsset* UTAbilitySystemLibrary::GetCharacterClassDataAsset(const UObject* WorldContextObject)
+{
+	ATGameModeBase* TGameMode = Cast<ATGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (TGameMode == nullptr) return nullptr;
+	return TGameMode->CharacterClassInfo;
+}
+
+int32 UTAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level)
+{
+	UTCharacterClassDataAsset* CharacterClassInfo = GetCharacterClassDataAsset(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return 0;
+
+	const FCharacterClassInfo& Info = CharacterClassInfo->GetCharacterClassInfo(CharacterClass);
+	const float XPReward = Info.XPReward.GetValueAtLevel(Level);
+
+	return static_cast<int32>(XPReward);
 }

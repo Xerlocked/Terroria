@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/TCharacterClassDataAsset.h"
 #include "UObject/Interface.h"
 #include "CharacterData.generated.h"
 class UAnimMontage;
@@ -31,4 +32,10 @@ public:
 	UAnimMontage* GetHitReactMontage();
 
 	virtual void Die() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ECharacterClass GetCharacterClass() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetPlayerLevel() const;
 };
