@@ -6,6 +6,10 @@
 #include "TUserWidgetController.h"
 #include "TOverlayWidgetController.generated.h"
 
+struct FTAbilityData;
+class UTAbilitySystemComponent;
+class UTAbilityDataAsset;
+
 USTRUCT(BlueprintType)
 struct FWidgetMessageRow : public FTableRowBase
 {
@@ -24,8 +28,8 @@ struct FWidgetMessageRow : public FTableRowBase
 class UTUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatusChangedSignature, int32, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAssetTagMessageSignature, FWidgetMessageRow, WidgetMessageRow);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FTAbilityData&, AbilityData);
 
 /**
  * 
@@ -55,6 +59,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Message")
 	FOnAssetTagMessageSignature OnAssetTagMessage;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Message")
+	FAbilityDataSignature OnAbilityDataDelegate;
+	
 	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
 
@@ -69,6 +76,11 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|DataTable")
 	TObjectPtr<UDataTable> WidgetMessageDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|DataTable")
+	TObjectPtr<UTAbilityDataAsset> AbilityDataAsset;
+
+	void OnInitializeStartupAbilities(UTAbilitySystemComponent* TAbilitySystemComponent);
 };
 
 template <typename T>

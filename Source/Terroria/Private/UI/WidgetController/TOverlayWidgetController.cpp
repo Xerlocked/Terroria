@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAttributeSet.h"
+#include "AbilitySystem/Data/TAbilityDataAsset.h"
 #include "AbilitySystem/Data/TLevelUpDataAsset.h"
 #include "Player/TPlayerState.h"
 
@@ -20,6 +21,8 @@ void UTOverlayWidgetController::BroadcastInitialValues()
 
 void UTOverlayWidgetController::BindCallbacksToDependencies()
 {
+	check(WidgetMessageDataTable);
+	
 	ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
 	TPlayerState->OnXPChangedDelegate.AddUObject(this, &UTOverlayWidgetController::OnXPChanged);
 
@@ -52,21 +55,34 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 		OnMaxManaChanged.Broadcast(Data.NewValue);
 	});
 
-	check(WidgetMessageDataTable);
-	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->AssetTagsEvent.AddLambda(
-		[this](const FGameplayTagContainer& AssetTags)
+	if (UTAbilitySystemComponent* ASC = Cast<UTAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if (ASC->bStartupAbilitiesGiven)
 		{
-			const FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
-			for (const FGameplayTag& AssetTag : AssetTags)
+			OnInitializeStartupAbilities(ASC);
+		}
+		else
+		{
+			ASC->AbilityGivenEvent.AddUObject(this, &UTOverlayWidgetController::OnInitializeStartupAbilities);
+		}
+		
+		ASC->AssetTagsEvent.AddLambda(
+			[this](const FGameplayTagContainer& AssetTags)
 			{
-				if (AssetTag.MatchesTag(MessageTag))
+				const FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				for (const FGameplayTag& AssetTag : AssetTags)
 				{
-					const FWidgetMessageRow* Row = GetDataTableRowByTag<FWidgetMessageRow>(WidgetMessageDataTable, AssetTag);
-					OnAssetTagMessage.Broadcast(*Row);
+					if (AssetTag.MatchesTag(MessageTag))
+					{
+						const FWidgetMessageRow* Row = GetDataTableRowByTag<FWidgetMessageRow>(WidgetMessageDataTable, AssetTag);
+						OnAssetTagMessage.Broadcast(*Row);
+					}
 				}
 			}
-		}
-	);
+		);
+	}
+	
+	
 }
 
 void UTOverlayWidgetController::OnXPChanged(int32 NewXP) const
@@ -90,4 +106,19 @@ void UTOverlayWidgetController::OnXPChanged(int32 NewXP) const
 
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 	}
+}
+
+void UTOverlayWidgetController::OnInitializeStartupAbilities(UTAbilitySystemComponent* TAbilitySystemComponent)
+{
+	if (!TAbilitySystemComponent->bStartupAbilitiesGiven) return;
+
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this, TAbilitySystemComponent](const FGameplayAbilitySpec& Spec)
+	{
+		FTAbilityData Data = AbilityDataAsset->FindAbilityDataByTag(TAbilitySystemComponent->GetAbilityTagFromSpec(Spec));
+		Data.InputTag = TAbilitySystemComponent->GetInputTagFromSpec(Spec);
+		OnAbilityDataDelegate.Broadcast(Data);
+	});
+	
+	TAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }

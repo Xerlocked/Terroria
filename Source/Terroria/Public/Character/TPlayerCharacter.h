@@ -7,6 +7,8 @@
 #include "Interface/PlayerInterface.h"
 #include "TPlayerCharacter.generated.h"
 
+struct FGameplayTag;
+class UNiagaraComponent;
 struct FInputActionValue;
 class UCameraComponent;
 class USpringArmComponent;
@@ -18,10 +20,13 @@ class TERRORIA_API ATPlayerCharacter : public ATCharacterBase, public IPlayerInt
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* SpringArm;
+	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* PlayerCamera;
+	TObjectPtr<UCameraComponent> PlayerCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraComponent> LevelUpNiagara;
 
 public:
 	ATPlayerCharacter();
@@ -31,10 +36,10 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	// Begin CharacterData Interface
-	virtual FVector GetWeaponSocketLocation() const override;
+	virtual FVector GetWeaponSocketLocation_Implementation() const override;
 	virtual int32 GetPlayerLevel_Implementation() const override;
 	// End CharacterData Interface
-	
+
 	// Begin Player Interface
 	virtual void LevelUP_Implementation() override;
 	virtual void AddToXP_Implementation(int32 NewXP) override;
@@ -43,11 +48,17 @@ public:
 	virtual int32 GetXP_Implementation() const override;
 	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
 	virtual int32 FindLevelForXP_Implementation(int32 XP) const override;
+	virtual int32 GetAttributePoint_Implementation() const override;
 	// End Player Interface
-	
+
 private:
 	virtual void SetupAbilityActorInfo() override;
-	
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLevelUpParticles() const;
+
+	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
 public:
 	UCameraComponent* GetPlayerCameraComponent() const { return PlayerCamera; }
 

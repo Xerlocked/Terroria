@@ -3,6 +3,8 @@
 #include "Public/Character/TPlayerCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "NiagaraComponent.h"
+#include "TGameplayTags.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/Data/TLevelUpDataAsset.h"
 #include "Camera/CameraComponent.h"
@@ -16,7 +18,7 @@ ATPlayerCharacter::ATPlayerCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 	bUseControllerRotationYaw = false;
-	
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->SetUsingAbsoluteRotation(true);
@@ -25,10 +27,15 @@ ATPlayerCharacter::ATPlayerCharacter()
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->TargetArmLength = 1450.f;
 	SpringArm->CameraLagSpeed = 3.0f;
-	
+
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(SpringArm);
 	PlayerCamera->FieldOfView = 60.0f;
+
+	LevelUpNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LevelUpNiagara"));
+	LevelUpNiagara->SetupAttachment(RootComponent);
+	LevelUpNiagara->SetRelativeLocation(FVector(0.f, 0.f, -88.f));
+	LevelUpNiagara->SetAutoActivate(false);
 
 	CharacterClass = ECharacterClass::Magician;
 }
@@ -52,18 +59,18 @@ int32 ATPlayerCharacter::GetPlayerLevel_Implementation() const
 {
 	const ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
 	check(TPlayerState);
-	
+
 	return TPlayerState->GetPlayerLevel();
 }
 
-FVector ATPlayerCharacter::GetWeaponSocketLocation() const
+FVector ATPlayerCharacter::GetWeaponSocketLocation_Implementation() const
 {
 	return GetMesh()->GetSocketLocation(WeaponSocketName);
 }
 
 void ATPlayerCharacter::LevelUP_Implementation()
 {
-	
+	MulticastLevelUpParticles();
 }
 
 void ATPlayerCharacter::AddToXP_Implementation(int32 NewXP)
@@ -82,7 +89,9 @@ void ATPlayerCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
 
 void ATPlayerCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
 {
-	
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	TPlayerState->AddToAttributePoint(InAttributePoints);
 }
 
 int32 ATPlayerCharacter::GetXP_Implementation() const
@@ -106,11 +115,18 @@ int32 ATPlayerCharacter::FindLevelForXP_Implementation(int32 XP) const
 	return TPlayerState->LevelUpInfo->FindLevelForXP(XP);
 }
 
+int32 ATPlayerCharacter::GetAttributePoint_Implementation() const
+{
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	return TPlayerState->GetAttributePoint();
+}
+
 void ATPlayerCharacter::SetupAbilityActorInfo()
 {
 	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
 	check(TPlayerState);
-	
+
 	TPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(TPlayerState, this);
 	AbilitySystemComponent = TPlayerState->GetAbilitySystemComponent();
 	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->BindAbilityActorInfo();
@@ -124,11 +140,26 @@ void ATPlayerCharacter::SetupAbilityActorInfo()
 		}
 	}
 
+
+	AbilitySystemComponent->RegisterGameplayTagEvent(FTGameplayTags::Get().Effects_HitReact).AddUObject(
+		this, &ThisClass::OnHitReactTagChanged);
+
 	InitializeDefaultAttributes();
+}
+
+void ATPlayerCharacter::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+}
+
+void ATPlayerCharacter::MulticastLevelUpParticles_Implementation() const
+{
+	if (IsValid(LevelUpNiagara))
+	{
+		LevelUpNiagara->Activate(true);
+	}
 }
 
 void ATPlayerCharacter::UpdateCameraZoom(float LengthDelta) const
 {
 	SpringArm->TargetArmLength = FMath::Clamp(SpringArm->TargetArmLength + LengthDelta, 650.f, 2000.f);
 }
-

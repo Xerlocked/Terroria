@@ -3,7 +3,9 @@
 
 #include "AbilitySystem/TAbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/TGameplayAbility.h"
+#include "Interface/PlayerInterface.h"
 
 void UTAbilitySystemComponent::BindAbilityActorInfo()
 {
@@ -21,6 +23,8 @@ void UTAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UG
 			GiveAbility(AbilitySpec);
 		}
 	}
+	bStartupAbilitiesGiven = true;
+	AbilityGivenEvent.Broadcast(this);
 }
 
 void UTAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
@@ -62,11 +66,86 @@ void UTAbilitySystemComponent::ReleaseAbilityInputTag(const FGameplayTag& InputT
 	}
 }
 
+void UTAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate)
+{
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to execute delegate in %hs"), __FUNCTION__);
+		}
+	}
+}
+
+FGameplayTag UTAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& Spec)
+{
+	if (Spec.Ability)
+	{
+		for (FGameplayTag Tag : Spec.Ability.Get()->GetAssetTags())
+		{
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Ability"))))
+			{
+				return Tag;
+			}
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UTAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& Spec)
+{
+	for (FGameplayTag Tag : Spec.GetDynamicSpecSourceTags())
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
+		{			
+			return Tag;
+		}
+	}
+	return FGameplayTag();
+}
+
+void UTAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if (IPlayerInterface::Execute_GetAttributePoint(GetAvatarActor()) > 0)
+		{
+			ServerUpgradeAttribute(AttributeTag);
+		}
+	}
+}
+
+void UTAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
+
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_AddToAttributePoints(GetAvatarActor(), -1);
+	}
+}
+
 void UTAbilitySystemComponent::EffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
-                                             const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const
+                                                            const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
 
 	AssetTagsEvent.Broadcast(TagContainer);
+}
+
+void UTAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+
+	if (!bStartupAbilitiesGiven)
+	{
+		bStartupAbilitiesGiven = true;
+		AbilityGivenEvent.Broadcast(this);
+	}
 }

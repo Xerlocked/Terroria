@@ -26,12 +26,14 @@ public:
 	static UTAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "AbilitySystemLibrary|CharacterClass")
-	static void InitializedDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+	static void InitializedDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass,
+	                                         float Level, UAbilitySystemComponent* ASC);
 
 	UFUNCTION(BlueprintCallable, Category = "AbilitySystemLibrary|CharacterClass")
-	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+	static void GiveCommonAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 
 	static UTCharacterClassDataAsset* GetCharacterClassDataAsset(const UObject* WorldContextObject);
 
-	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
+	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass,
+	                                         int32 Level);
 };

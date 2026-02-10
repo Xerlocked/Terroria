@@ -10,3 +10,14 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTerroria, Log, All);
 #define CUSTOM_DEPTH_RED 250
 
 #define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel1
+
+UENUM(BlueprintType)
+enum class ETerroriaCursor : uint8
+{
+	Normal,
+	Attack,
+	Interact,
+	Unavailable,
+	Working,
+	Busy
+};

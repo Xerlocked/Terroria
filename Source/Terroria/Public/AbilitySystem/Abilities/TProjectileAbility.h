@@ -17,7 +17,9 @@ class TERRORIA_API UTProjectileAbility : public UTGameplayAbility
 	GENERATED_BODY()
 
 protected:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	                             const FGameplayAbilityActivationInfo ActivationInfo,
+	                             const FGameplayEventData* TriggerEventData) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void SpawnProjectile(const FVector& TargetLocation);
@@ -26,5 +28,5 @@ protected:
 	TSubclassOf<ATBaseProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;;
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

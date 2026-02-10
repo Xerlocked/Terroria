@@ -8,6 +8,7 @@
 
 class UTAttributeDataAsset;
 struct FTAttributeData;
+struct FGameplayTag;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeDataSignature, const FTAttributeData&, Data);
 
@@ -23,8 +24,14 @@ public:
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
 
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FAttributeDataSignature OnAttributeDataDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnPlayerStatusChangedSignature AttributeChangedDelegate;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

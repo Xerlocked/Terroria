@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2025 @xerlock. All Rights Reserved.
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/PlayerController.h"
 #include "GameplayTagContainer.h"
+#include "Terroria.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "TPlayerController.generated.h"
 
@@ -28,59 +29,68 @@ class TERRORIA_API ATPlayerController : public APlayerController
 
 public:
 	ATPlayerController();
-	
+
 	virtual void BeginPlay() override;
 
 	virtual void PlayerTick(float DeltaTime) override;
 
 	virtual void OnRep_Pawn() override;
-	
+
+	UFUNCTION(BlueprintCallable)
+	ETerroriaCursor GetPlayerCursor() const { return PlayerCursorType; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerCursor(ETerroriaCursor NewType) { PlayerCursorType = NewType; }
+
 protected:
 	virtual void SetupInputComponent() override;
 
 	virtual void OnPossess(APawn* InPawn) override;
-	
+
 	UPROPERTY(EditAnywhere, Category="Input|Input Mappings")
 	TArray<UInputMappingContext*> MappingContexts;
-	
+
 	UPROPERTY(EditAnywhere, Category="Effect")
 	UNiagaraSystem* FXCursor;
 
 	UPROPERTY(EditAnywhere, Category="Game|Properties")
 	float ZoomDelta;
 
+	UPROPERTY(VisibleAnywhere, Category="Game|Cursor")
+	ETerroriaCursor PlayerCursorType;
+
 	UPROPERTY(VisibleAnywhere)
 	USplineComponent* RouteSpline;
-	
+
 private:
 	void TraceCursor();
-	
+
 	void MovePlayerToDestination();
 
 	void DoWheel(const FInputActionValue& Value);
-	
+
 	void PressedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 
 	void ReleasedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 
 	void HeldAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
-	
+
 	UPROPERTY()
 	TObjectPtr<ATPlayerCharacter> PossessedCharacter;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UTGameplayInput> InputContext;
-	
+
 	UPROPERTY()
 	TObjectPtr<UTAbilitySystemComponent> TAbilitySystemComponent;
 
 	FHitResult CursorTraceHit;
-	
+
 	// ~Begin Highlight
 	TScriptInterface<IHighlight> LastActor;
 	TScriptInterface<IHighlight> CurrentActor;
 	// ~End Highlight
-	
+
 	// ~Begin Click to Move
 	/** Cached location, Spline, or last clicked location. */
 	FVector CachedDestination;
@@ -96,16 +106,15 @@ private:
 	float StopMovementRadius = 50.f;
 
 	/** Moving to current destination */
-	uint8 bMovingToDestination: 1;
+	uint8 bMovingToDestination : 1;
 
 	/** if true, target selected */
-	uint8 bIsTargeting: 1;
+	uint8 bIsTargeting : 1;
 	// ~End Click to Move
 
-private:
 	/**
-	 * Returns the controller's TAbilitySystemComponent.
-	 * @return UTAbilitySystemComponent;
-	 */
+		 * Returns the controller's TAbilitySystemComponent.
+		 * @return UTAbilitySystemComponent;
+		 */
 	UTAbilitySystemComponent* GetTASC();
 };

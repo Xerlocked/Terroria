@@ -9,7 +9,7 @@
 struct TDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
-	
+
 	TDamageStatics()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UTAttributeSet, Armor, Target, false);
@@ -27,7 +27,8 @@ UExecutionCalc_Damage::UExecutionCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 }
 
-void UExecutionCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UExecutionCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+                                                   FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	UAbilitySystemComponent* SourceAbility = ExecutionParams.GetSourceAbilitySystemComponent();
 	UAbilitySystemComponent* TargetAbility = ExecutionParams.GetTargetAbilitySystemComponent();
@@ -49,8 +50,9 @@ void UExecutionCalc_Damage::Execute_Implementation(const FGameplayEffectCustomEx
 	TargetArmor = FMath::Max<float>(TargetArmor, 0.f);
 
 	FinalDamage -= TargetArmor;
-	FinalDamage = FMath::Max<float>(FinalDamage, 0.5f);
+	FinalDamage = FMath::Max<float>(FinalDamage, -0.5f);
 
-	const FGameplayModifierEvaluatedData EvaluatedData(UTAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, FinalDamage);
+	const FGameplayModifierEvaluatedData EvaluatedData(UTAttributeSet::GetIncomingDamageAttribute(),
+	                                                   EGameplayModOp::Additive, FinalDamage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }

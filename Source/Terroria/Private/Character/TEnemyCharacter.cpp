@@ -9,19 +9,18 @@
 #include "AbilitySystem/TAttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "UI/Widget/TUserWidget.h"
 
 ATEnemyCharacter::ATEnemyCharacter()
 {
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	
+
 	AbilitySystemComponent = CreateDefaultSubobject<UTAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
 	AttributeSet = CreateDefaultSubobject<UTAttributeSet>(TEXT("AttributeSet"));
-	
+
 	HealthWidget = CreateDefaultSubobject<UWidgetComponent>("HealthWidget");
 	HealthWidget->SetupAttachment(GetRootComponent());
 }
@@ -29,15 +28,17 @@ ATEnemyCharacter::ATEnemyCharacter()
 void ATEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	SetupAbilityActorInfo();
-	UTAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
-	
+	AddCharacterAbilities();
+	UTAbilitySystemLibrary::GiveCommonAbilities(this, AbilitySystemComponent);
+
 	if (UTUserWidget* TUserWidget = Cast<UTUserWidget>(HealthWidget->GetUserWidgetObject()))
 	{
 		TUserWidget->SetWidgetController(this);
 	}
-	
+
 	if (const UTAttributeSet* TAttributes = Cast<UTAttributeSet>(AttributeSet))
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(TAttributes->GetHealthAttribute()).AddLambda(
@@ -46,15 +47,13 @@ void ATEnemyCharacter::BeginPlay()
 				OnHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
-		
+
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(TAttributes->GetMaxHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
-
-		AbilitySystemComponent->RegisterGameplayTagEvent(FTGameplayTags::Get().Effects_HitReact).AddUObject(this, &ThisClass::OnHitReactTagChanged);
 
 		OnHealthChanged.Broadcast(TAttributes->GetHealth());
 		OnMaxHealthChanged.Broadcast(TAttributes->GetMaxHealth());
@@ -72,15 +71,14 @@ void ATEnemyCharacter::DeactiveHighlightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 }
 
+FVector ATEnemyCharacter::GetWeaponSocketLocation_Implementation() const
+{
+	return GetMesh()->GetSocketLocation(WeaponSocketName);
+}
+
 int32 ATEnemyCharacter::GetPlayerLevel_Implementation() const
 {
 	return Level;
-}
-
-void ATEnemyCharacter::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
-{
-	bHitReact = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReact ? 0.f : BaseWalkSpeed;
 }
 
 void ATEnemyCharacter::Die()
@@ -94,8 +92,6 @@ void ATEnemyCharacter::SetupAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->BindAbilityActorInfo();
 
-	
-	
 	InitializeDefaultAttributes();
 }
 

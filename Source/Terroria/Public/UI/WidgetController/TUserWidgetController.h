@@ -7,6 +7,8 @@
 #include "UObject/NoExportTypes.h"
 #include "TUserWidgetController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatusChangedSignature, int32, NewValue);
+
 class UAttributeSet;
 class UAbilitySystemComponent;
 

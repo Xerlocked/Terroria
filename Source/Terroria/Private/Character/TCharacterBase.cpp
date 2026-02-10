@@ -45,11 +45,11 @@ void ATCharacterBase::MulticastDeath_Implementation()
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
 }
 
 void ATCharacterBase::SetupAbilityActorInfo()
 {
-	
 }
 
 void ATCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass, float Level) const
@@ -58,7 +58,8 @@ void ATCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> EffectClass
 
 	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
 	ContextHandle.AddSourceObject(this);
-	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(EffectClass, Level,  ContextHandle);
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(
+		EffectClass, Level, ContextHandle);
 
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }
@@ -73,9 +74,11 @@ void ATCharacterBase::InitializeDefaultAttributes() const
 void ATCharacterBase::AddCharacterAbilities()
 {
 	UTAbilitySystemComponent* TASC = CastChecked<UTAbilitySystemComponent>(AbilitySystemComponent.Get());
-	if (!HasAuthority()) return;
+	if (!HasAuthority())
+	{
+		return;
+	}
 
 	TASC->AddCharacterAbilities(StartupAbilities);
 	TASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
-

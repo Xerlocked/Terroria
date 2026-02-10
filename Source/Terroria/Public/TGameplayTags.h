@@ -11,10 +11,9 @@
 
 struct FTGameplayTags
 {
-public:
 	static const FTGameplayTags& Get() { return GameplayTags; }
 	static void InitializeNativeGameplayTags();
-	
+
 	FGameplayTag Attribute_Primary_Strength;
 	FGameplayTag Attribute_Primary_Agility;
 	FGameplayTag Attribute_Primary_Intelligence;
@@ -31,8 +30,24 @@ public:
 	FGameplayTag Attribute_Secondary_ManaRegeneration;
 	FGameplayTag Attribute_Secondary_Armor;
 	FGameplayTag Attribute_Secondary_MovementSpeed;
-	
+	FGameplayTag Attribute_Secondary_CDR;
+
 	FGameplayTag Attribute_Meta_IncomingXP;
+
+	FGameplayTag Ability_Common_PrimaryAttack;
+	FGameplayTag Ability_Common_Flash;
+
+	FGameplayTag Ability_Dark_LightingBolt;
+	FGameplayTag Ability_Dark_Shield;
+	FGameplayTag Ability_Dark_Shockwave;
+	FGameplayTag Ability_Dark_BlackHole;
+
+	FGameplayTag Cooldown_Dark_LightingBolt;
+	FGameplayTag Cooldown_Dark_Shield;
+	FGameplayTag Cooldown_Dark_Shockwave;
+	FGameplayTag Cooldown_Dark_BlackHole;
+	FGameplayTag Cooldown_Attack_Melee;
+	FGameplayTag Cooldown_Attack_Ranged;
 
 	FGameplayTag Input_Mouse_LMB;
 	FGameplayTag Input_Mouse_RMB;
@@ -44,10 +59,11 @@ public:
 	FGameplayTag Input_Keyboard_Space;
 
 	FGameplayTag Damage;
-	
 
 	FGameplayTag Effects_HitReact;
-	
+
+	FGameplayTag State_Cast_Rooted;
+
 private:
 	static FTGameplayTags GameplayTags;
 };

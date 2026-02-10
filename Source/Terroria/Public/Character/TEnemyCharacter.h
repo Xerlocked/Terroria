@@ -26,20 +26,20 @@ public:
 	virtual void DeactiveHighlightActor() override;
 	//~End Highlight interface
 
+	virtual FVector GetWeaponSocketLocation_Implementation() const override;
 	virtual int32 GetPlayerLevel_Implementation() const override;
 
-	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
-
 	virtual void Die() override;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Character|Combat")
-	bool bHitReact = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Combat")
+	float PrimaryAttackRange = 150.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	float BaseWalkSpeed = 250.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	float LifeSpan = 5.f;
-	
+
 protected:
 	virtual void SetupAbilityActorInfo() override;
 

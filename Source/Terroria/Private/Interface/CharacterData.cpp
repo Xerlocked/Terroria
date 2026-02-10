@@ -2,8 +2,3 @@
 
 
 #include "Interface/CharacterData.h"
-
-FVector ICharacterData::GetWeaponSocketLocation() const
-{
-	return FVector();
-}

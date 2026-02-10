@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2025 @xerlock. All Rights Reserved.
 
 
 #include "Public/Player/TPlayerController.h"
@@ -23,14 +23,15 @@ void ATPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 	{
 		for (UInputMappingContext* CurrentContext : MappingContexts)
 		{
 			Subsystem->AddMappingContext(CurrentContext, 0);
 		}
 	}
-	
+
 	SetShowMouseCursor(true);
 }
 
@@ -58,9 +59,10 @@ void ATPlayerController::TraceCursor()
 
 	if (!CursorTraceHit.bBlockingHit)
 	{
+		SetPlayerCursor(ETerroriaCursor::Normal);
 		return;
 	}
-	
+
 	LastActor = CurrentActor;
 	CurrentActor = CursorTraceHit.GetActor();
 
@@ -69,23 +71,40 @@ void ATPlayerController::TraceCursor()
 		if (LastActor)
 		{
 			LastActor->DeactiveHighlightActor();
+			SetPlayerCursor(ETerroriaCursor::Normal);
 		}
 
 		if (CurrentActor)
 		{
 			CurrentActor->ActiveHighlightActor();
+			SetPlayerCursor(ETerroriaCursor::Attack);
 		}
 	}
 }
 
 void ATPlayerController::MovePlayerToDestination()
 {
-	if (!bMovingToDestination) return;
+	if (!bMovingToDestination)
+	{
+		return;
+	}
+
+	if (GetTASC())
+	{
+		FGameplayTag RootTag = FTGameplayTags::Get().State_Cast_Rooted;
+		if (GetTASC()->HasMatchingGameplayTag(RootTag))
+		{
+			bMovingToDestination = false;
+			return;
+		}
+	}
 
 	if (PossessedCharacter)
 	{
-		const FVector LocationOnSpline = RouteSpline->FindLocationClosestToWorldLocation(PossessedCharacter->GetActorLocation(), ESplineCoordinateSpace::World);
-		const FVector WorldDirection = RouteSpline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		const FVector LocationOnSpline = RouteSpline->FindLocationClosestToWorldLocation(
+			PossessedCharacter->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector WorldDirection = RouteSpline->FindDirectionClosestToWorldLocation(
+			LocationOnSpline, ESplineCoordinateSpace::World);
 
 		PossessedCharacter->AddMovementInput(WorldDirection);
 
@@ -100,12 +119,12 @@ void ATPlayerController::MovePlayerToDestination()
 void ATPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	
+
 	if (UTGameplayInputComponent* GameplayInputComponent = Cast<UTGameplayInputComponent>(InputComponent))
 	{
-		GameplayInputComponent->BindAbilityActions(InputContext, this, &ThisClass::PressedAbilityAction, &ThisClass::ReleasedAbilityAction, &ThisClass::HeldAbilityAction);
+		GameplayInputComponent->BindAbilityActions(InputContext, this, &ThisClass::PressedAbilityAction,
+		                                           &ThisClass::ReleasedAbilityAction, &ThisClass::HeldAbilityAction);
 	}
-	
 }
 
 void ATPlayerController::OnPossess(APawn* InPawn)
@@ -130,6 +149,14 @@ void ATPlayerController::PressedAbilityAction(const FInputActionValue& Value, FG
 	{
 		bIsTargeting = CurrentActor ? true : false;
 		bMovingToDestination = false;
+		// GetTASC()->LocalInputCancel();
+		GetTASC()->TargetCancel();
+	}
+
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_LMB))
+	{
+		// GetTASC()->LocalInputConfirm();
+		GetTASC()->TargetConfirm();
 	}
 }
 
@@ -146,10 +173,19 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 
 	if (MousePressTime <= MinPressedThreshold && PossessedCharacter)
 	{
-		if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, PossessedCharacter->GetActorLocation(), CachedDestination))
+		MousePressTime = 0.f;
+		bIsTargeting = false;
+
+		if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(
+			this, PossessedCharacter->GetActorLocation(), CachedDestination))
 		{
 			RouteSpline->ClearSplinePoints();
-			
+
+			if (NavPath->PathPoints.IsEmpty())
+			{
+				return;
+			}
+
 			for (const FVector& PathPoint : NavPath->PathPoints)
 			{
 				RouteSpline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World);
@@ -158,22 +194,18 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 			CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
 			bMovingToDestination = true;
 		}
-
-		MousePressTime = 0.f;
-		bIsTargeting = false;
 	}
 }
 
 void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const FGameplayTag Tag)
 {
-
 	// Todo: To make GA.
 	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_Wheel))
 	{
 		DoWheel(Value);
 		return;
 	}
-	
+
 	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
 		if (GetTASC())
@@ -192,6 +224,15 @@ void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const
 	}
 	else
 	{
+		if (GetTASC())
+		{
+			FGameplayTag RootTag = FTGameplayTags::Get().State_Cast_Rooted;
+			if (GetTASC()->HasMatchingGameplayTag(RootTag))
+			{
+				return;
+			}
+		}
+
 		MousePressTime += GetWorld()->GetDeltaSeconds();
 
 		if (CursorTraceHit.bBlockingHit)
@@ -211,7 +252,8 @@ UTAbilitySystemComponent* ATPlayerController::GetTASC()
 {
 	if (TAbilitySystemComponent == nullptr)
 	{
-		TAbilitySystemComponent = Cast<UTAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+		TAbilitySystemComponent = Cast<UTAbilitySystemComponent>(
+			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
 	return TAbilitySystemComponent;
 }

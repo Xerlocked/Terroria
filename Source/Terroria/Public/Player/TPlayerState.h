@@ -34,11 +34,15 @@ public:
 
 	FOnPlayerStatChanged OnLevelChangedDelegate;
 
+	FOnPlayerStatChanged OnAttributePointChangedDelegate;
+
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 	FORCEINLINE int32 GetXP() const { return XP; }
+	FORCEINLINE int32 GetAttributePoint() const { return AttributePoint; }
 
 	void AddToXP(int32 InXP);
 	void AddToLevel(int32 InLevel);
+	void AddToAttributePoint(int32 InAttributePoint);
 	
 	void SetXP(int32 InXP);
 	void SetLevel(int32 InLevel);
@@ -57,9 +61,17 @@ private:
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_XP, Category = "Character|Status")
 	int32 XP = 0;
 
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_AttributePoint, Category = "Character|Status")
+	int32 AttributePoint = 0;
+	
+
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 
 	UFUNCTION()
 	void OnRep_XP(int32 OldXP);
+
+	UFUNCTION()
+	void OnRep_AttributePoint(int32 OldAttributePoint);
+	
 };

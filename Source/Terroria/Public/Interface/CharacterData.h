@@ -23,8 +23,9 @@ class TERRORIA_API ICharacterData
 	GENERATED_BODY()
 
 public:
-	virtual FVector GetWeaponSocketLocation() const;
-	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetWeaponSocketLocation() const;
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& TargetLocation);
 

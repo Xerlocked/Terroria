@@ -12,7 +12,9 @@ USTRUCT()
 struct FEffectProperty
 {
 	GENERATED_BODY()
-	FEffectProperty() {}
+	FEffectProperty()
+	{
+	}
 
 	FGameplayEffectContextHandle ContextHandle;
 
@@ -41,7 +43,7 @@ struct FEffectProperty
 	ACharacter* TargetCharacter = nullptr;
 };
 
-template<class T>
+template <class T>
 using TStaticFuncPtr = TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
 
 /**
@@ -55,16 +57,16 @@ class TERRORIA_API UTAttributeSet : public UAttributeSet
 public:
 	UTAttributeSet();
 
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
-	
-public:
+
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
-	
+
 	//~  Begin Primary Attributes (핵심 능력치)
 	// 플레이어가 직접 포인트를 투자하는 능력치
 
@@ -156,11 +158,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed, Category = "Character|Unique")
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, MovementSpeed)
-	
+
 	/* 방어력 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Armor, Category = "Character|Unique")
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, Armor)
+
+	/* 쿨감 */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_CooldownReduction, Category = "Character|Unique")
+	FGameplayAttributeData CooldownReduction;
+	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, CooldownReduction)
 	//~ End Unique Attributes
 
 	//~ Begin Meta Attributes
@@ -172,7 +179,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingXP;
 	ATTRIBUTE_ACCESSORS_BASIC(UTAttributeSet, IncomingXP);
-	
+
 	//~ End Meat Attributes
 
 	UFUNCTION()
@@ -192,24 +199,21 @@ public:
 
 	UFUNCTION()
 	void OnRep_AttackPower(const FGameplayAttributeData& OldValue) const;
-	
+
 	UFUNCTION()
 	void OnRep_MagicPower(const FGameplayAttributeData& OldValue) const;
-	
+
 	UFUNCTION()
 	void OnRep_AttackSpeed(const FGameplayAttributeData& OldValue) const;
-	
-	UFUNCTION()
-	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue) const;
-	
+
 	UFUNCTION()
 	void OnRep_CriticalHitChance(const FGameplayAttributeData& OldValue) const;
-	
+
 	UFUNCTION()
 	void OnRep_CriticalHitDamage(const FGameplayAttributeData& OldValue) const;
 
 	//------------------
-	
+
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue) const;
 
@@ -231,9 +235,18 @@ public:
 	//------------------
 
 	UFUNCTION()
+	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue) const;
+
+	UFUNCTION()
 	void OnRep_Armor(const FGameplayAttributeData& OldValue) const;
+
+	UFUNCTION()
+	void OnRep_CooldownReduction(const FGameplayAttributeData& OldValue) const;
 
 private:
 	void GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property);
 	void SendXPEvent(const FEffectProperty& Property);
+
+	bool bNeedMaxHealth = false;
+	bool bNeedMaxMana = false;
 };
