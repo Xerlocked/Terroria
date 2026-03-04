@@ -38,36 +38,23 @@ void UTGameplayAbility_Shield::OnAvatarSet(const FGameplayAbilityActorInfo* Acto
 	}
 }
 
-void UTGameplayAbility_Shield::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-                                               const FGameplayAbilityActorInfo* ActorInfo,
-                                               const FGameplayAbilityActivationInfo ActivationInfo,
-                                               const FGameplayEventData* TriggerEventData)
+
+void UTGameplayAbility_Shield::ApplyActiveEffect(UAbilitySystemComponent* AbilitySystemComponent)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
-
 	if (HasAuthority(&CurrentActivationInfo) && ActiveEffectClass)
 	{
-		UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
-		if (ASC)
+		if (AbilitySystemComponent)
 		{
-			FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+			FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
 			ContextHandle.AddSourceObject(this);
 
-			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(
+			FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(
 				ActiveEffectClass, GetAbilityLevel(), ContextHandle);
 
 			if (SpecHandle.IsValid())
 			{
-				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			}
 		}
 	}
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }

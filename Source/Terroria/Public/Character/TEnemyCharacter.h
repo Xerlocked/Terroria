@@ -6,9 +6,11 @@
 #include "TCharacterBase.h"
 #include "AbilitySystem/Data/TCharacterClassDataAsset.h"
 #include "Interface/Highlight.h"
+#include "Interface/Interactable.h"
 #include "UI/WidgetController/TOverlayWidgetController.h"
 #include "TEnemyCharacter.generated.h"
 
+class USphereComponent;
 class UWidgetComponent;
 
 UCLASS()
@@ -22,14 +24,13 @@ public:
 	virtual void BeginPlay() override;
 
 	//~Begin Highlight interface
+	virtual ETerroriaCursor GetCursorType() override;
 	virtual void ActiveHighlightActor() override;
 	virtual void DeactiveHighlightActor() override;
 	//~End Highlight interface
 
-	virtual FVector GetWeaponSocketLocation_Implementation() const override;
+	virtual FVector GetWeaponSocketLocation_Implementation(FName SocketName) const override;
 	virtual int32 GetPlayerLevel_Implementation() const override;
-
-	virtual void Die() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Combat")
 	float PrimaryAttackRange = 150.0f;
@@ -40,18 +41,32 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	float LifeSpan = 5.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
+	FString DisplayCharacterName;
+
 protected:
 	virtual void SetupAbilityActorInfo() override;
 
 	virtual void InitializeDefaultAttributes() const override;
 
+	virtual void SpawnDropItem() override;
+
+	virtual void HandleDeath_Implementation() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
+	bool bIsDead = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UWidgetComponent> HealthWidget;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+	TObjectPtr<USphereComponent> InteractionCollision;
+
+	UPROPERTY
+	(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable)

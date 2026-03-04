@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Data/TCharacterClassDataAsset.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TAbilitySystemLibrary.generated.h"
 
+class UAttributeSet;
+struct FGameplayAttribute;
 class UAbilitySystemComponent;
 class UTAttributeMenuWidgetController;
 class UTOverlayWidgetController;
@@ -36,4 +39,6 @@ public:
 
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass,
 	                                         int32 Level);
+
+	static FGameplayAttribute GetAttributeByTag(UAttributeSet* InAttributeSet, const FGameplayTag& Tag);
 };

@@ -7,11 +7,16 @@
 #include "Engine/DataAsset.h"
 #include "TAbilityDataAsset.generated.h"
 
+class UGameplayAbility;
+
 USTRUCT(BlueprintType)
 struct FTAbilityData
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> AbilityClass = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag AbilityTag = FGameplayTag();
 
@@ -31,7 +36,6 @@ class TERRORIA_API UTAbilityDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FTAbilityData> AbilityDataContainer;
 

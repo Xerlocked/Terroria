@@ -15,6 +15,8 @@ class TERRORIA_API UTGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
+	UTGameplayAbility();
+
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle,

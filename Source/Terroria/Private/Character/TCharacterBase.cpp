@@ -2,6 +2,8 @@
 
 
 #include "Character/TCharacterBase.h"
+
+#include "TGameplayTags.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAttributeSet.h"
 #include "Components/CapsuleComponent.h"
@@ -31,21 +33,22 @@ UAnimMontage* ATCharacterBase::GetHitReactMontage_Implementation()
 
 void ATCharacterBase::Die()
 {
-	MulticastDeath();
+	if (HasAuthority())
+	{
+		if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+		{
+			ASC->CancelAllAbilities();
+
+			FGameplayTagContainer DeathAbilityContainer;
+			DeathAbilityContainer.AddTag(FTGameplayTags::Get().Effects_Death);
+			ASC->TryActivateAbilitiesByTag(DeathAbilityContainer);
+		}
+	}
 }
 
 ECharacterClass ATCharacterBase::GetCharacterClass_Implementation() const
 {
 	return CharacterClass;
-}
-
-void ATCharacterBase::MulticastDeath_Implementation()
-{
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
-	GetMesh()->SetEnableGravity(true);
-	GetMesh()->SetSimulatePhysics(true);
-	GetMesh()->WakeAllRigidBodies();
 }
 
 void ATCharacterBase::SetupAbilityActorInfo()
@@ -81,4 +84,40 @@ void ATCharacterBase::AddCharacterAbilities()
 
 	TASC->AddCharacterAbilities(StartupAbilities);
 	TASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
+}
+
+void ATCharacterBase::SpawnDropItem()
+{
+}
+
+void ATCharacterBase::EnableRagdoll()
+{
+	SetReplicateMovement(false);
+
+	if (GetCapsuleComponent())
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
+
+	if (GetMesh())
+	{
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetEnableGravity(true);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->bBlendPhysics = true;
+	}
+}
+
+void ATCharacterBase::HandleDeath_Implementation()
+{
+}
+
+void ATCharacterBase::OnDeathTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		HandleDeath();
+	}
 }

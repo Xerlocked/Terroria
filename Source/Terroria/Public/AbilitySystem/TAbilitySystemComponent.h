@@ -9,6 +9,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAssetTagsEvent, const FGameplayTagContainer&)
 DECLARE_MULTICAST_DELEGATE_OneParam(FAbilityGivenEvent, UTAbilitySystemComponent*)
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityLevelChanged, const FGameplayTag& /*AbilityTag*/, int32 /*NewLevel*/);
 
 /**
  * 
@@ -23,7 +24,7 @@ public:
 
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
 	bool bStartupAbilitiesGiven = false;
-	
+
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
 
 	void HeldAbilityInputTag(const FGameplayTag& InputTag);
@@ -38,17 +39,21 @@ public:
 
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
+	void UpgradeAbility(const FGameplayTag& AbilityTag);
+
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
-	
+
 	FOnAssetTagsEvent AssetTagsEvent;
 
 	FAbilityGivenEvent AbilityGivenEvent;
-	
-protected:
 
+	FAbilityLevelChanged AbilityLevelChangedEvent;
+
+protected:
 	UFUNCTION(Client, Reliable)
-	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const;
+	void EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec,
+	                   FActiveGameplayEffectHandle ActiveEffectHandle) const;
 
 	virtual void OnRep_ActivateAbilities() override;
 };

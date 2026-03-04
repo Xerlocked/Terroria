@@ -106,6 +106,10 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 		FString("BlackHole"));
 
 	// Cooldown
+	GameplayTags.Cooldown_Common_Flash = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Common.Flash"),
+		FString("Flash Cooldown"));
+
 	GameplayTags.Cooldown_Dark_LightingBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Dark.LightingBolt"),
 		FString("Dark LightingBolt Cooldown"));
@@ -163,15 +167,51 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 		FName("Input.Keyboard.Space"),
 		FString("Keyboard Space bar"));
 
+	GameplayTags.Input_Keyboard_P = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Keyboard.P"),
+		FString("Keyboard P"));
+
+	GameplayTags.Input_Keyboard_F = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Keyboard.F"),
+		FString("Keyboard F"));
+
+	GameplayTags.Input_Keyboard_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Keyboard.1"),
+		FString("Keyboard 1"));
+
+	// Damage
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Damage"),
 		FString("Damage"));
+	GameplayTags.Damage_Type_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Type.Physical"),
+		FString("Physical Damage")
+	);
+	GameplayTags.Damage_Type_Spell = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Type.Spell"),
+		FString("Spell Damage")
+	);
 
+	// Effect
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Effects.HitReact"),
 		FString("Effects HitReact"));
 
+	GameplayTags.Effects_Death = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Effects.Death"),
+		FString("Effects Death"));
+
+
+	// State Tags
 	GameplayTags.State_Cast_Rooted = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("State.Cast.Rooted"),
 		FString("Rooted for casting"));
+
+	GameplayTags.State_Attacking = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Attacking"),
+		FString("Attack State"));
+
+	GameplayTags.State_Death = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Death"),
+		FString("Death State"));
 }

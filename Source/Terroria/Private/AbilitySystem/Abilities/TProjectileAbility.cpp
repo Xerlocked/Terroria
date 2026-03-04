@@ -17,7 +17,7 @@ void UTProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
+void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation, const FName SocketName)
 {
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer)
@@ -28,7 +28,7 @@ void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
 	if (GetAvatarActorFromActorInfo()->Implements<UCharacterData>())
 	{
 		const FVector FireSocketLocation = ICharacterData::Execute_GetWeaponSocketLocation(
-			GetAvatarActorFromActorInfo());
+			GetAvatarActorFromActorInfo(), SocketName);
 		FRotator ProjectileRot = (TargetLocation - FireSocketLocation).Rotation();
 		ProjectileRot.Pitch = 0.f;
 
@@ -45,8 +45,10 @@ void UTProjectileAbility::SpawnProjectile(const FVector& TargetLocation)
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(
 			DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
 
+		const float DamageBaseValue = ProjectileDamage.GetValueAtLevel(GetAbilityLevel());
+
 		const FTGameplayTags& GameplayTags = FTGameplayTags::Get();
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, 50.f);
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, DamageBaseValue);
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(ProjectileTransform);

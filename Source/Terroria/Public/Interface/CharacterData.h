@@ -24,7 +24,7 @@ class TERRORIA_API ICharacterData
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FVector GetWeaponSocketLocation() const;
+	FVector GetWeaponSocketLocation(FName SocketName) const;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& TargetLocation);
@@ -39,4 +39,13 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetPlayerLevel() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character|ComboSystem")
+	int32 GetComboIndex();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character|ComboSystem")
+	void ResetCombo();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character|ComboSystem")
+	void AdvanceCombo();
 };

@@ -7,13 +7,18 @@
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAbilitySystemLibrary.h"
 #include "AbilitySystem/TAttributeSet.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interface/Itemable.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Widget/TUserWidget.h"
 
 ATEnemyCharacter::ATEnemyCharacter()
 {
-	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 
 	AbilitySystemComponent = CreateDefaultSubobject<UTAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -23,6 +28,11 @@ ATEnemyCharacter::ATEnemyCharacter()
 
 	HealthWidget = CreateDefaultSubobject<UWidgetComponent>("HealthWidget");
 	HealthWidget->SetupAttachment(GetRootComponent());
+
+	InteractionCollision = CreateDefaultSubobject<USphereComponent>("InteractionCollision");
+	InteractionCollision->SetupAttachment(GetRootComponent());
+	InteractionCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	InteractionCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
 void ATEnemyCharacter::BeginPlay()
@@ -60,6 +70,11 @@ void ATEnemyCharacter::BeginPlay()
 	}
 }
 
+ETerroriaCursor ATEnemyCharacter::GetCursorType()
+{
+	return ETerroriaCursor::Attack;
+}
+
 void ATEnemyCharacter::ActiveHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
@@ -71,9 +86,9 @@ void ATEnemyCharacter::DeactiveHighlightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 }
 
-FVector ATEnemyCharacter::GetWeaponSocketLocation_Implementation() const
+FVector ATEnemyCharacter::GetWeaponSocketLocation_Implementation(FName SocketName) const
 {
-	return GetMesh()->GetSocketLocation(WeaponSocketName);
+	return GetMesh()->GetSocketLocation(SocketName);
 }
 
 int32 ATEnemyCharacter::GetPlayerLevel_Implementation() const
@@ -81,16 +96,13 @@ int32 ATEnemyCharacter::GetPlayerLevel_Implementation() const
 	return Level;
 }
 
-void ATEnemyCharacter::Die()
-{
-	SetLifeSpan(LifeSpan);
-	Super::Die();
-}
-
 void ATEnemyCharacter::SetupAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UTAbilitySystemComponent>(AbilitySystemComponent)->BindAbilityActorInfo();
+
+	AbilitySystemComponent->RegisterGameplayTagEvent(FTGameplayTags::Get().State_Death).AddUObject(
+		this, &ThisClass::OnDeathTagChanged);
 
 	InitializeDefaultAttributes();
 }
@@ -98,4 +110,66 @@ void ATEnemyCharacter::SetupAbilityActorInfo()
 void ATEnemyCharacter::InitializeDefaultAttributes() const
 {
 	UTAbilitySystemLibrary::InitializedDefaultAttributes(this, CharacterClass, 1.0f, AbilitySystemComponent);
+}
+
+void ATEnemyCharacter::SpawnDropItem()
+{
+	for (const FDropItem& Item : DropTables)
+	{
+		if ((FMath::FRand() <= Item.DropChance) && Item.ItemClass)
+		{
+			int32 AmountToDrop = FMath::RandRange(Item.MinQuantity, Item.MaxQuantity);
+
+			FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+
+			FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
+
+			AActor* SpawnedItem = GetWorld()->SpawnActorDeferred<AActor>(
+				Item.ItemClass,
+				SpawnTransform,
+				this,
+				nullptr,
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+			);
+
+			if (SpawnedItem)
+			{
+				if (SpawnedItem->Implements<UItemable>())
+				{
+					IItemable::Execute_SetAmount(SpawnedItem, AmountToDrop);
+				}
+
+				UGameplayStatics::FinishSpawningActor(SpawnedItem, SpawnTransform);
+			}
+		}
+	}
+}
+
+void ATEnemyCharacter::HandleDeath_Implementation()
+{
+	if (HasAuthority())
+	{
+		if (bIsDead)
+		{
+			return;
+		}
+
+		bIsDead = true;
+
+		if (GetController())
+		{
+			GetController()->UnPossess();
+		}
+
+		SpawnDropItem();
+
+		SetLifeSpan(LifeSpan);
+
+		if (HealthWidget)
+		{
+			HealthWidget->DestroyComponent();
+		}
+
+		InteractionCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }

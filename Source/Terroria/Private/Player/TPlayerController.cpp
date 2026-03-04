@@ -8,15 +8,20 @@
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "TGameplayTags.h"
+#include "AbilitySystem/Component/GameplayInputQueueSystem.h"
 #include "Character/TPlayerCharacter.h"
 #include "Components/SplineComponent.h"
 #include "Input/TGameplayInputComponent.h"
 #include "Interface/Highlight.h"
+#include "Player/TShopComponent.h"
+#include "UI/HUD/THUD.h"
 
 ATPlayerController::ATPlayerController()
 {
 	ZoomDelta = 50.f;
 	RouteSpline = CreateDefaultSubobject<USplineComponent>("RouteSpline");
+	InputQueueSystemComponent = CreateDefaultSubobject<UGameplayInputQueueSystem>(TEXT("InputQueueSystemComponent"));
+	ShopComponent = CreateDefaultSubobject<UTShopComponent>(TEXT("ShopComponent"));
 }
 
 void ATPlayerController::BeginPlay()
@@ -30,6 +35,11 @@ void ATPlayerController::BeginPlay()
 		{
 			Subsystem->AddMappingContext(CurrentContext, 0);
 		}
+	}
+
+	if (InputQueueSystemComponent)
+	{
+		InputQueueSystemComponent->OnInputConsumed.AddDynamic(this, &ATPlayerController::OnInputConsumed);
 	}
 
 	SetShowMouseCursor(true);
@@ -53,8 +63,33 @@ void ATPlayerController::OnRep_Pawn()
 	}
 }
 
+void ATPlayerController::OnInputConsumed(FGameplayTag InputTag)
+{
+	// bMovingToDestination = false;
+	// StopMovement();
+}
+
 void ATPlayerController::TraceCursor()
 {
+	if (bIsPointerOverUI)
+	{
+		// UI 위에 올렸을 때 기존 몬스터 하이라이트 끄기
+		if (CurrentActor)
+		{
+			CurrentActor->DeactiveHighlightActor();
+			CurrentActor = nullptr;
+		}
+
+		if (LastActor)
+		{
+			LastActor->DeactiveHighlightActor();
+			LastActor = nullptr;
+		}
+
+		SetPlayerCursor(ETerroriaCursor::Normal);
+		return;
+	}
+
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorTraceHit);
 
 	if (!CursorTraceHit.bBlockingHit)
@@ -68,6 +103,7 @@ void ATPlayerController::TraceCursor()
 
 	if (LastActor != CurrentActor)
 	{
+		OnTargeting.Broadcast(CursorTraceHit.GetActor());
 		if (LastActor)
 		{
 			LastActor->DeactiveHighlightActor();
@@ -145,18 +181,52 @@ void ATPlayerController::DoWheel(const FInputActionValue& Value)
 
 void ATPlayerController::PressedAbilityAction(const FInputActionValue& Value, FGameplayTag Tag)
 {
-	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
-	{
-		bIsTargeting = CurrentActor ? true : false;
-		bMovingToDestination = false;
-		// GetTASC()->LocalInputCancel();
-		GetTASC()->TargetCancel();
-	}
-
 	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_LMB))
 	{
-		// GetTASC()->LocalInputConfirm();
 		GetTASC()->TargetConfirm();
+	}
+
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Keyboard_P))
+	{
+		if (const ATHUD* HUD = Cast<ATHUD>(GetHUD()))
+		{
+			HUD->ToggleShopWidget();
+		}
+		return;
+	}
+
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Keyboard_F))
+	{
+		if (IsValid(PossessedCharacter.Get()))
+		{
+			PossessedCharacter->ProcessInteraction();
+		}
+		return;
+	}
+
+	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
+	{
+		MousePressTime = 0.f;
+		bIsTargeting = CurrentActor ? true : false;
+		bMovingToDestination = false;
+		GetTASC()->TargetCancel();
+	}
+	else
+	{
+		bool bBuffered = false;
+		if (InputQueueSystemComponent && InputQueueSystemComponent->IsInputBufferEnabled())
+		{
+			bBuffered = InputQueueSystemComponent->AddInputToBuffer(Tag);
+		}
+		else if (GetTASC() && GetTASC()->HasMatchingGameplayTag(FTGameplayTags::Get().State_Attacking))
+		{
+			return;
+		}
+
+		if (!bBuffered && GetTASC())
+		{
+			GetTASC()->HeldAbilityInputTag(Tag);
+		}
 	}
 }
 
@@ -164,10 +234,10 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 {
 	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
-		if (GetTASC())
-		{
-			GetTASC()->HeldAbilityInputTag(Tag);
-		}
+		// if (GetTASC())
+		// {
+		// 	GetTASC()->HeldAbilityInputTag(Tag);
+		// }
 		return;
 	}
 
@@ -199,7 +269,6 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 
 void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const FGameplayTag Tag)
 {
-	// Todo: To make GA.
 	if (Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_Wheel))
 	{
 		DoWheel(Value);
@@ -208,19 +277,19 @@ void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const
 
 	if (!Tag.MatchesTagExact(FTGameplayTags::Get().Input_Mouse_RMB))
 	{
-		if (GetTASC())
-		{
-			GetTASC()->HeldAbilityInputTag(Tag);
-		}
+		// if (GetTASC())
+		// {
+		// 	GetTASC()->HeldAbilityInputTag(Tag);
+		// }
 		return;
 	}
 
 	if (bIsTargeting)
 	{
-		if (GetTASC())
-		{
-			GetTASC()->HeldAbilityInputTag(Tag);
-		}
+		// if (GetTASC())
+		// {
+		// 	GetTASC()->HeldAbilityInputTag(Tag);
+		// }
 	}
 	else
 	{
@@ -255,5 +324,6 @@ UTAbilitySystemComponent* ATPlayerController::GetTASC()
 		TAbilitySystemComponent = Cast<UTAbilitySystemComponent>(
 			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
+
 	return TAbilitySystemComponent;
 }

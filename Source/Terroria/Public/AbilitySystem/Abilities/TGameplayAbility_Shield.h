@@ -20,10 +20,8 @@ public:
 	/* Passive Effect */
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
-	/* Active Effect */
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	                             const FGameplayAbilityActivationInfo ActivationInfo,
-	                             const FGameplayEventData* TriggerEventData) override;
+	UFUNCTION(BlueprintCallable, Category = "Effects")
+	void ApplyActiveEffect(UAbilitySystemComponent* AbilitySystemComponent);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")

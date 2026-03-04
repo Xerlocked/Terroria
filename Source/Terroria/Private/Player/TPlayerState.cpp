@@ -2,6 +2,7 @@
 
 
 #include "Player/TPlayerState.h"
+
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAttributeSet.h"
 #include "Net/UnrealNetwork.h"
@@ -13,7 +14,7 @@ ATPlayerState::ATPlayerState()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<UTAttributeSet>(TEXT("AttributeSet"));
-	
+
 	SetNetUpdateFrequency(100.f);
 }
 
@@ -24,6 +25,7 @@ void ATPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& 
 	DOREPLIFETIME(ATPlayerState, Level);
 	DOREPLIFETIME(ATPlayerState, XP);
 	DOREPLIFETIME(ATPlayerState, AttributePoint);
+	DOREPLIFETIME(ATPlayerState, Gold);
 }
 
 UAbilitySystemComponent* ATPlayerState::GetAbilitySystemComponent() const
@@ -47,6 +49,12 @@ void ATPlayerState::AddToAttributePoint(int32 InAttributePoint)
 {
 	AttributePoint += InAttributePoint;
 	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void ATPlayerState::AddToGold(int32 InGold)
+{
+	Gold += InGold;
+	OnGoldChangedDelegate.Broadcast(Gold);
 }
 
 void ATPlayerState::SetXP(int32 InXP)
@@ -74,4 +82,9 @@ void ATPlayerState::OnRep_XP(int32 OldXP)
 void ATPlayerState::OnRep_AttributePoint(int32 OldAttributePoint)
 {
 	OnAttributePointChangedDelegate.Broadcast(AttributePoint);
+}
+
+void ATPlayerState::OnRep_Gold(int32 OldGold)
+{
+	OnGoldChangedDelegate.Broadcast(Gold);
 }

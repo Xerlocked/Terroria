@@ -42,6 +42,7 @@ struct FTGameplayTags
 	FGameplayTag Ability_Dark_Shockwave;
 	FGameplayTag Ability_Dark_BlackHole;
 
+	FGameplayTag Cooldown_Common_Flash;
 	FGameplayTag Cooldown_Dark_LightingBolt;
 	FGameplayTag Cooldown_Dark_Shield;
 	FGameplayTag Cooldown_Dark_Shockwave;
@@ -57,12 +58,20 @@ struct FTGameplayTags
 	FGameplayTag Input_Keyboard_E;
 	FGameplayTag Input_Keyboard_R;
 	FGameplayTag Input_Keyboard_Space;
+	FGameplayTag Input_Keyboard_P;
+	FGameplayTag Input_Keyboard_F;
+	FGameplayTag Input_Keyboard_1;
 
 	FGameplayTag Damage;
+	FGameplayTag Damage_Type_Physical;
+	FGameplayTag Damage_Type_Spell;
 
 	FGameplayTag Effects_HitReact;
+	FGameplayTag Effects_Death;
 
 	FGameplayTag State_Cast_Rooted;
+	FGameplayTag State_Attacking;
+	FGameplayTag State_Death;
 
 private:
 	static FTGameplayTags GameplayTags;

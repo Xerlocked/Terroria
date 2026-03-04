@@ -10,6 +10,9 @@
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "TPlayerController.generated.h"
 
+class UTShopComponent;
+class UGameplayInputQueueSystem;
+class IInteractable;
 class USplineComponent;
 class UTAbilitySystemComponent;
 class UTGameplayInput;
@@ -22,6 +25,9 @@ class UInputMappingContext;
 /**
  * 
  */
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetingDelegate, AActor*);
+
 UCLASS(Abstract)
 class TERRORIA_API ATPlayerController : public APlayerController
 {
@@ -36,11 +42,27 @@ public:
 
 	virtual void OnRep_Pawn() override;
 
+	/**
+		 * Returns the controller's TAbilitySystemComponent.
+		 * @return UTAbilitySystemComponent;
+		 */
+	UTAbilitySystemComponent* GetTASC();
+
 	UFUNCTION(BlueprintCallable)
 	ETerroriaCursor GetPlayerCursor() const { return PlayerCursorType; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerCursor(ETerroriaCursor NewType) { PlayerCursorType = NewType; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetIsPointerOverUI(bool bIsOver)
+	{
+		bIsPointerOverUI = bIsOver;
+	}
+
+	UTShopComponent* GetShopComponent() const { return ShopComponent; }
+
+	FOnTargetingDelegate OnTargeting;
 
 protected:
 	virtual void SetupInputComponent() override;
@@ -62,7 +84,16 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USplineComponent* RouteSpline;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UGameplayInputQueueSystem> InputQueueSystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTShopComponent> ShopComponent;
+
 private:
+	UFUNCTION()
+	void OnInputConsumed(FGameplayTag InputTag);
+
 	void TraceCursor();
 
 	void MovePlayerToDestination();
@@ -85,6 +116,8 @@ private:
 	TObjectPtr<UTAbilitySystemComponent> TAbilitySystemComponent;
 
 	FHitResult CursorTraceHit;
+
+	bool bIsPointerOverUI = false;
 
 	// ~Begin Highlight
 	TScriptInterface<IHighlight> LastActor;
@@ -111,10 +144,4 @@ private:
 	/** if true, target selected */
 	uint8 bIsTargeting : 1;
 	// ~End Click to Move
-
-	/**
-		 * Returns the controller's TAbilitySystemComponent.
-		 * @return UTAbilitySystemComponent;
-		 */
-	UTAbilitySystemComponent* GetTASC();
 };

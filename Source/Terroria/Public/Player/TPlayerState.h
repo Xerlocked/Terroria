@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "TPlayerState.generated.h"
 
+class UTShopDataAsset;
 class UTLevelUpDataAsset;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -22,19 +23,24 @@ public:
 	ATPlayerState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UAttributeSet* GetAttributeSet() { return AttributeSet; }
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	TObjectPtr<UTLevelUpDataAsset> LevelUpInfo;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	TObjectPtr<UTShopDataAsset> ShopInfo;
+
 	FOnPlayerStatChanged OnXPChangedDelegate;
 
 	FOnPlayerStatChanged OnLevelChangedDelegate;
 
 	FOnPlayerStatChanged OnAttributePointChangedDelegate;
+
+	FOnPlayerStatChanged OnGoldChangedDelegate;
 
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 	FORCEINLINE int32 GetXP() const { return XP; }
@@ -43,14 +49,20 @@ public:
 	void AddToXP(int32 InXP);
 	void AddToLevel(int32 InLevel);
 	void AddToAttributePoint(int32 InAttributePoint);
-	
+
 	void SetXP(int32 InXP);
 	void SetLevel(int32 InLevel);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerState|Func")
+	int32 GetGold() const { return Gold; }
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerState|Func")
+	void AddToGold(int32 InGold);
+
 protected:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-	
+
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
@@ -63,7 +75,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_AttributePoint, Category = "Character|Status")
 	int32 AttributePoint = 0;
-	
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_Gold, Category = "Character|Status")
+	int32 Gold = 0;
 
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
@@ -73,5 +87,7 @@ private:
 
 	UFUNCTION()
 	void OnRep_AttributePoint(int32 OldAttributePoint);
-	
+
+	UFUNCTION()
+	void OnRep_Gold(int32 OldGold);
 };

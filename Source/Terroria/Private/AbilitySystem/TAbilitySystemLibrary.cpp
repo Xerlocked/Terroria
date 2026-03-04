@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/TAbilitySystemLibrary.h"
 
+#include "AbilitySystem/TAttributeSet.h"
 #include "Game/TGameModeBase.h"
 #include "Interface/CharacterData.h"
 #include "Kismet/GameplayStatics.h"
@@ -127,4 +128,22 @@ int32 UTAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldCo
 	const float XPReward = Info.XPReward.GetValueAtLevel(Level);
 
 	return static_cast<int32>(XPReward);
+}
+
+FGameplayAttribute UTAbilitySystemLibrary::GetAttributeByTag(UAttributeSet* InAttributeSet, const FGameplayTag& Tag)
+{
+	UTAttributeSet* AS = Cast<UTAttributeSet>(InAttributeSet);
+	if (AS == nullptr)
+	{
+		return FGameplayAttribute();
+	}
+
+	if (AS->TagsToAttributes.Contains(Tag))
+	{
+		return AS->TagsToAttributes[Tag]();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Can't find Attribute for Tag [%s] in TAbilitySystemLibrary::GetAttributeByTag"),
+	       *Tag.ToString());
+	return FGameplayAttribute(); // 매칭되는게 없으면 빈 속성 반환
 }

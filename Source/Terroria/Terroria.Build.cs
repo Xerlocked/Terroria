@@ -8,7 +8,8 @@ public class Terroria : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] {
+		PublicDependencyModuleNames.AddRange(new[]
+		{
 			"Core",
 			"CoreUObject",
 			"Engine",
@@ -19,6 +20,7 @@ public class Terroria : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
+			"SlateCore",
 			"GameplayTasks",
 			"GameplayTags",
 			"GameplayAbilities",
@@ -28,14 +30,9 @@ public class Terroria : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
-		PublicIncludePaths.AddRange(new string[] {
-			"Terroria",
-			"Terroria/Variant_Horror",
-			"Terroria/Variant_Horror/UI",
-			"Terroria/Variant_Shooter",
-			"Terroria/Variant_Shooter/AI",
-			"Terroria/Variant_Shooter/UI",
-			"Terroria/Variant_Shooter/Weapons"
+		PublicIncludePaths.AddRange(new[]
+		{
+			"Terroria"
 		});
 
 		// Uncomment if you are using Slate UI

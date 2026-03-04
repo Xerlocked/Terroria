@@ -7,6 +7,8 @@
 #include "AbilitySystem/TAttributeSet.h"
 #include "AbilitySystem/Data/TAbilityDataAsset.h"
 #include "AbilitySystem/Data/TLevelUpDataAsset.h"
+#include "Character/TEnemyCharacter.h"
+#include "Player/TPlayerController.h"
 #include "Player/TPlayerState.h"
 
 void UTOverlayWidgetController::BroadcastInitialValues()
@@ -17,12 +19,17 @@ void UTOverlayWidgetController::BroadcastInitialValues()
 	OnMaxHealthChanged.Broadcast(Attributes->GetMaxHealth());
 	OnManaChanged.Broadcast(Attributes->GetMana());
 	OnMaxManaChanged.Broadcast(Attributes->GetMaxMana());
+
+	ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
+	OnPlayerLevelChanged.Broadcast(TPlayerState->GetPlayerLevel());
+	OnPlayerGoldChanged.Broadcast(TPlayerState->GetGold());
 }
 
 void UTOverlayWidgetController::BindCallbacksToDependencies()
 {
 	check(WidgetMessageDataTable);
-	
+
+	// PlayerState
 	ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
 	TPlayerState->OnXPChangedDelegate.AddUObject(this, &UTOverlayWidgetController::OnXPChanged);
 
@@ -32,28 +39,49 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 			OnPlayerLevelChanged.Broadcast(InLevel);
 		}
 	);
-	
+
+	TPlayerState->OnGoldChangedDelegate.AddLambda
+	([this](int32 InGold)
+		{
+			OnPlayerGoldChanged.Broadcast(InGold);
+		}
+	);
+
+	// PlayerController
+	ATPlayerController* TPlayerController = CastChecked<ATPlayerController>(PlayerController);
+
+	TPlayerController->OnTargeting.AddLambda([this](AActor* TargetActor)
+	{
+		OnTargetingActorChanged.Broadcast(TargetActor);
+	});
+
+
+	// ASC
 	const UTAttributeSet* Attributes = CastChecked<UTAttributeSet>(AttributeSet);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
-	{
-		OnHealthChanged.Broadcast(Data.NewValue);
-	});
-	
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetMaxHealthAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
-	{
-		OnMaxHealthChanged.Broadcast(Data.NewValue);
-	});
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		});
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
-	{
-		OnManaChanged.Broadcast(Data.NewValue);
-	});
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		});
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetMaxManaAttribute()).AddLambda([this](const FOnAttributeChangeData& Data)
-	{
-		OnMaxManaChanged.Broadcast(Data.NewValue);
-	});
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnManaChanged.Broadcast(Data.NewValue);
+		});
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attributes->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxManaChanged.Broadcast(Data.NewValue);
+		});
 
 	if (UTAbilitySystemComponent* ASC = Cast<UTAbilitySystemComponent>(AbilitySystemComponent))
 	{
@@ -65,7 +93,14 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 		{
 			ASC->AbilityGivenEvent.AddUObject(this, &UTOverlayWidgetController::OnInitializeStartupAbilities);
 		}
-		
+
+		ASC->AbilityLevelChangedEvent.AddLambda(
+			[this](const FGameplayTag& AbilityTag, int32 NewLevel)
+			{
+				OnAbilityLevelChanged.Broadcast(AbilityTag, NewLevel);
+			}
+		);
+
 		ASC->AssetTagsEvent.AddLambda(
 			[this](const FGameplayTagContainer& AssetTags)
 			{
@@ -74,22 +109,21 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 				{
 					if (AssetTag.MatchesTag(MessageTag))
 					{
-						const FWidgetMessageRow* Row = GetDataTableRowByTag<FWidgetMessageRow>(WidgetMessageDataTable, AssetTag);
+						const FWidgetMessageRow* Row = GetDataTableRowByTag<FWidgetMessageRow>(
+							WidgetMessageDataTable, AssetTag);
 						OnAssetTagMessage.Broadcast(*Row);
 					}
 				}
 			}
 		);
 	}
-	
-	
 }
 
 void UTOverlayWidgetController::OnXPChanged(int32 NewXP) const
 {
 	const ATPlayerState* TPlayerState = CastChecked<ATPlayerState>(PlayerState);
 	const UTLevelUpDataAsset* LevelUpInfo = TPlayerState->LevelUpInfo;
-	
+
 	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out TPlayerState Blueprint"));
 
 	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
@@ -110,15 +144,19 @@ void UTOverlayWidgetController::OnXPChanged(int32 NewXP) const
 
 void UTOverlayWidgetController::OnInitializeStartupAbilities(UTAbilitySystemComponent* TAbilitySystemComponent)
 {
-	if (!TAbilitySystemComponent->bStartupAbilitiesGiven) return;
+	if (!TAbilitySystemComponent->bStartupAbilitiesGiven)
+	{
+		return;
+	}
 
 	FForEachAbility BroadcastDelegate;
 	BroadcastDelegate.BindLambda([this, TAbilitySystemComponent](const FGameplayAbilitySpec& Spec)
 	{
-		FTAbilityData Data = AbilityDataAsset->FindAbilityDataByTag(TAbilitySystemComponent->GetAbilityTagFromSpec(Spec));
+		FTAbilityData Data = AbilityDataAsset->FindAbilityDataByTag(
+			TAbilitySystemComponent->GetAbilityTagFromSpec(Spec));
 		Data.InputTag = TAbilitySystemComponent->GetInputTagFromSpec(Spec);
 		OnAbilityDataDelegate.Broadcast(Data);
 	});
-	
+
 	TAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }

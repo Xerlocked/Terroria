@@ -38,7 +38,10 @@ void UTAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubcla
 
 void UTAbilitySystemComponent::HeldAbilityInputTag(const FGameplayTag& InputTag)
 {
-	if (!InputTag.IsValid()) return;
+	if (!InputTag.IsValid())
+	{
+		return;
+	}
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
@@ -48,6 +51,7 @@ void UTAbilitySystemComponent::HeldAbilityInputTag(const FGameplayTag& InputTag)
 			if (!AbilitySpec.IsActive())
 			{
 				TryActivateAbility(AbilitySpec.Handle);
+				UE_LOG(LogTemp, Warning, TEXT("Ability activated"));
 			}
 		}
 	}
@@ -55,7 +59,10 @@ void UTAbilitySystemComponent::HeldAbilityInputTag(const FGameplayTag& InputTag)
 
 void UTAbilitySystemComponent::ReleaseAbilityInputTag(const FGameplayTag& InputTag)
 {
-	if (!InputTag.IsValid()) return;
+	if (!InputTag.IsValid())
+	{
+		return;
+	}
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
@@ -98,7 +105,7 @@ FGameplayTag UTAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilit
 	for (FGameplayTag Tag : Spec.GetDynamicSpecSourceTags())
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
-		{			
+		{
 			return Tag;
 		}
 	}
@@ -131,7 +138,8 @@ void UTAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGame
 }
 
 void UTAbilitySystemComponent::EffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
-                                                            const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const
+                                                            const FGameplayEffectSpec& EffectSpec,
+                                                            FActiveGameplayEffectHandle ActiveEffectHandle) const
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);

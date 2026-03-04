@@ -28,8 +28,12 @@ struct FWidgetMessageRow : public FTableRowBase
 class UTUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAssetTagMessageSignature, FWidgetMessageRow, WidgetMessageRow);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FTAbilityData&, AbilityData);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTargetingActorChangedSignature, AActor*, TargetActor);
 
 /**
  * 
@@ -61,19 +65,28 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Message")
 	FAbilityDataSignature OnAbilityDataDelegate;
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Level")
 	FOnPlayerStatusChangedSignature OnPlayerLevelChanged;
-	
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Gold")
+	FOnPlayerStatusChangedSignature OnPlayerGoldChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Targeting")
+	FOnTargetingActorChangedSignature OnTargetingActorChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Abilities")
+	FOnAbilityLevelChangedSignature OnAbilityLevelChanged;
+
 protected:
-	template<typename T>
+	template <typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 
 	void OnXPChanged(int32 NewXP) const;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS|DataTable")
 	TObjectPtr<UDataTable> WidgetMessageDataTable;
 

@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AttributeSet.h"
 #include "TCharacterBase.h"
 #include "Interface/PlayerInterface.h"
 #include "TPlayerCharacter.generated.h"
 
+class UDialogueComponent;
+class USphereComponent;
+class UGameplayInputQueueSystem;
 struct FGameplayTag;
 class UNiagaraComponent;
 struct FInputActionValue;
@@ -28,16 +32,28 @@ class TERRORIA_API ATPlayerCharacter : public ATCharacterBase, public IPlayerInt
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> LevelUpNiagara;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraComponent> FlashNiagara;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USphereComponent> InteractionCollision;
+
 public:
 	ATPlayerCharacter();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void OnRep_PlayerState() override;
 
 	// Begin CharacterData Interface
-	virtual FVector GetWeaponSocketLocation_Implementation() const override;
+	virtual FVector GetWeaponSocketLocation_Implementation(FName SocketName) const override;
 	virtual int32 GetPlayerLevel_Implementation() const override;
+
+	virtual int32 GetComboIndex_Implementation() override;
+	virtual void AdvanceCombo_Implementation() override;
+	virtual void ResetCombo_Implementation() override;
 	// End CharacterData Interface
 
 	// Begin Player Interface
@@ -49,7 +65,27 @@ public:
 	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
 	virtual int32 FindLevelForXP_Implementation(int32 XP) const override;
 	virtual int32 GetAttributePoint_Implementation() const override;
+	virtual ATPlayerController* GetPlayerController_Implementation() const override;
+
+	virtual int32 GetCurrentGold_Implementation() const override;
+	virtual bool SpendGold_Implementation(int32 Amount) override;
+	virtual int32 GetItemLevel_Implementation(FGameplayTag EventTag) const override;
+
+	virtual void UpgradeAbilityByTag_Implementation(const FGameplayTag& AbilityTag) override;
 	// End Player Interface
+
+	void ProcessInteraction();
+
+protected:
+	virtual void HandleDeath_Implementation() override;
+
+	UFUNCTION()
+	void OnInteractionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	                               const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnInteractionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
 	virtual void SetupAbilityActorInfo() override;
@@ -57,10 +93,32 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFlashParticles() const;
+
 	void OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 public:
 	UCameraComponent* GetPlayerCameraComponent() const { return PlayerCamera; }
 
 	void UpdateCameraZoom(float LengthDelta) const;
+
+	UDialogueComponent* GetLocalDialogueComponent() const { return LocalDialogueComponent; }
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities|Mapping")
+	TMap<FGameplayTag, FGameplayAttribute> TagToAttributeMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UDialogueComponent> LocalDialogueComponent;
+
+private:
+	UPROPERTY(VisibleAnywhere, Replicated)
+	int32 CurrentComboIndex = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Combo")
+	int32 MaxComboCount = 2;
+
+	UPROPERTY()
+	TObjectPtr<AActor> InteractionActor;
 };
