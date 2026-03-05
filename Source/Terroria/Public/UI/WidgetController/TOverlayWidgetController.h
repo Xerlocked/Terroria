@@ -35,6 +35,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FTAbili
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTargetingActorChangedSignature, AActor*, TargetActor);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogStartedSignature, ACharacter*, InPlayer, ACharacter*, NPC);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNodeChangedSignature, const FDialogueNode&, Node);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDialogueEndedSignature);
+
 /**
  * 
  */
@@ -80,6 +86,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Abilities")
 	FOnAbilityLevelChangedSignature OnAbilityLevelChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Dialogue")
+	FOnDialogStartedSignature OnDialogStarted;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Dialogue")
+	FOnNodeChangedSignature OnDialogueNodeChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Dialogue")
+	FOnDialogueEndedSignature OnDialogueEnded;
 
 protected:
 	template <typename T>

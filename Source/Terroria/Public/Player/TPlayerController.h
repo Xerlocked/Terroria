@@ -10,6 +10,7 @@
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "TPlayerController.generated.h"
 
+class UDialogueManagerSubsystem;
 class UTShopComponent;
 class UGameplayInputQueueSystem;
 class IInteractable;
@@ -47,6 +48,9 @@ public:
 		 * @return UTAbilitySystemComponent;
 		 */
 	UTAbilitySystemComponent* GetTASC();
+
+	UFUNCTION(BlueprintCallable)
+	ATPlayerCharacter* GetPlayerCharacter() const { return PossessedCharacter; }
 
 	UFUNCTION(BlueprintCallable)
 	ETerroriaCursor GetPlayerCursor() const { return PlayerCursorType; }
@@ -92,6 +96,12 @@ protected:
 
 private:
 	UFUNCTION()
+	void OnDialogueStarted(ACharacter* InPlayer, ACharacter* NPC);
+
+	UFUNCTION()
+	void OnDialogueEnded(ACharacter* InPlayer);
+
+	UFUNCTION()
 	void OnInputConsumed(FGameplayTag InputTag);
 
 	void TraceCursor();
@@ -107,6 +117,9 @@ private:
 	void HeldAbilityAction(const FInputActionValue& Value, FGameplayTag Tag);
 
 	UPROPERTY()
+	TObjectPtr<UDialogueManagerSubsystem> DialogueManager;
+
+	UPROPERTY()
 	TObjectPtr<ATPlayerCharacter> PossessedCharacter;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -118,6 +131,8 @@ private:
 	FHitResult CursorTraceHit;
 
 	bool bIsPointerOverUI = false;
+
+	bool bIsInDialogue = false;
 
 	// ~Begin Highlight
 	TScriptInterface<IHighlight> LastActor;

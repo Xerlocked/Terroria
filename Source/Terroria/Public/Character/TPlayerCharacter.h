@@ -8,6 +8,7 @@
 #include "Interface/PlayerInterface.h"
 #include "TPlayerCharacter.generated.h"
 
+class UPlayerDialogueComponent;
 class UDialogueComponent;
 class USphereComponent;
 class UGameplayInputQueueSystem;
@@ -76,6 +77,8 @@ public:
 
 	void ProcessInteraction();
 
+	AActor* GetInteractionActor() const { return InteractionActor; }
+
 protected:
 	virtual void HandleDeath_Implementation() override;
 
@@ -103,14 +106,14 @@ public:
 
 	void UpdateCameraZoom(float LengthDelta) const;
 
-	UDialogueComponent* GetLocalDialogueComponent() const { return LocalDialogueComponent; }
+	UPlayerDialogueComponent* GetLocalDialogueComponent() const { return LocalDialogueComponent; }
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities|Mapping")
 	TMap<FGameplayTag, FGameplayAttribute> TagToAttributeMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UDialogueComponent> LocalDialogueComponent;
+	TObjectPtr<UPlayerDialogueComponent> LocalDialogueComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere, Replicated)

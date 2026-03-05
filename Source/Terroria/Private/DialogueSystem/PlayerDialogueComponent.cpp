@@ -70,8 +70,7 @@ void UPlayerDialogueComponent::TryInteract(ACharacter* TargetNPC)
 		return;
 	}
 
-	UNPCDialogueComponent* NPCDialogComp =
-		TargetNPC->FindComponentByClass<UNPCDialogueComponent>();
+	UNPCDialogueComponent* NPCDialogComp = TargetNPC->FindComponentByClass<UNPCDialogueComponent>();
 
 	if (!NPCDialogComp)
 	{
@@ -171,7 +170,7 @@ void UPlayerDialogueComponent::OnDialogueStarted(ACharacter* Player, ACharacter*
 	bIsInDialogue = true;
 	CurrentNPC = NPC;
 
-	OnLocalDialogueStarted.Broadcast(NPC); // UI에게 전달
+	OnLocalDialogueStarted.Broadcast(Player, NPC); // UI에게 전달
 }
 
 void UPlayerDialogueComponent::OnNodeChanged(ACharacter* Player, const FDialogueNode& Node)

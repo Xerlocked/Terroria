@@ -8,9 +8,9 @@
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/Data/TLevelUpDataAsset.h"
 #include "Camera/CameraComponent.h"
-#include "Component/DialogueComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "DialogueSystem/PlayerDialogueComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interface/Interactable.h"
@@ -50,7 +50,7 @@ ATPlayerCharacter::ATPlayerCharacter()
 	InteractionCollision->SetupAttachment(GetRootComponent());
 	InteractionCollision->SetCollisionProfileName(TEXT("TriggerAllDynamic"));
 
-	LocalDialogueComponent = CreateDefaultSubobject<UDialogueComponent>("LocalDialogueComponent");
+	LocalDialogueComponent = CreateDefaultSubobject<UPlayerDialogueComponent>("LocalDialogueComponent");
 
 	CharacterClass = ECharacterClass::Magician;
 }

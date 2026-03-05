@@ -7,6 +7,7 @@
 #include "Interface/Interactable.h"
 #include "TNonPlayerCharacter.generated.h"
 
+class UNPCDialogueComponent;
 class UWidgetComponent;
 class UDialogueDataAsset;
 class UDialogueComponent;
@@ -28,7 +29,14 @@ public:
 
 	virtual void EndInteraction_Implementation() override;
 
+	virtual FVector GetWeaponSocketLocation_Implementation(FName SocketName) const override;
+	virtual int32 GetPlayerLevel_Implementation() const override;
+
 protected:
+	virtual void SetupAbilityActorInfo() override;
+	virtual void InitializeDefaultAttributes() const override;
+	virtual void HandleDeath_Implementation() override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC|Data")
 	FName NPCId;
 
@@ -38,6 +46,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UWidgetComponent> InteractionWidgetComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC|Dialogue")
-	TObjectPtr<UDialogueDataAsset> DialogueDataAsset;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
+	TObjectPtr<UNPCDialogueComponent> DialogueComponent;
 };

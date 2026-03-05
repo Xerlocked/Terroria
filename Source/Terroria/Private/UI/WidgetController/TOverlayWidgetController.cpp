@@ -8,6 +8,8 @@
 #include "AbilitySystem/Data/TAbilityDataAsset.h"
 #include "AbilitySystem/Data/TLevelUpDataAsset.h"
 #include "Character/TEnemyCharacter.h"
+#include "Character/TPlayerCharacter.h"
+#include "DialogueSystem/PlayerDialogueComponent.h"
 #include "Player/TPlayerController.h"
 #include "Player/TPlayerState.h"
 
@@ -55,6 +57,24 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 		OnTargetingActorChanged.Broadcast(TargetActor);
 	});
 
+	if (const ATPlayerCharacter* TPlayerCharacter = Cast<ATPlayerCharacter>(AbilitySystemComponent->GetAvatarActor()))
+	{
+		TPlayerCharacter->GetLocalDialogueComponent()->OnLocalDialogueStarted.AddLambda(
+			[this](ACharacter* InPlayer, ACharacter* NPC)
+			{
+				OnDialogStarted.Broadcast(InPlayer, NPC);
+			});
+
+		TPlayerCharacter->GetLocalDialogueComponent()->OnLocalDialogueEnded.AddLambda([this]()
+		{
+			OnDialogueEnded.Broadcast();
+		});
+
+		TPlayerCharacter->GetLocalDialogueComponent()->OnLocalNodeChanged.AddLambda([this](const FDialogueNode& Node)
+		{
+			OnDialogueNodeChanged.Broadcast(Node);
+		});
+	}
 
 	// ASC
 	const UTAttributeSet* Attributes = CastChecked<UTAttributeSet>(AttributeSet);

@@ -11,6 +11,7 @@
 #include "AbilitySystem/Component/GameplayInputQueueSystem.h"
 #include "Character/TPlayerCharacter.h"
 #include "Components/SplineComponent.h"
+#include "DialogueSystem/DialogueManagerSubsystem.h"
 #include "Input/TGameplayInputComponent.h"
 #include "Interface/Highlight.h"
 #include "Player/TShopComponent.h"
@@ -42,12 +43,32 @@ void ATPlayerController::BeginPlay()
 		InputQueueSystemComponent->OnInputConsumed.AddDynamic(this, &ATPlayerController::OnInputConsumed);
 	}
 
+
+	DialogueManager = GetWorld()->GetSubsystem<UDialogueManagerSubsystem>();
+
+	if (!DialogueManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DialogueManager is not available."));
+		return;
+	}
+
+	DialogueManager->OnDialogueStarted.AddDynamic(
+		this, &ATPlayerController::OnDialogueStarted);
+
+	DialogueManager->OnDialogueEnded.AddDynamic(
+		this, &ATPlayerController::OnDialogueEnded);
+
 	SetShowMouseCursor(true);
 }
 
 void ATPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+
+	if (bIsInDialogue)
+	{
+		return;
+	}
 
 	TraceCursor();
 	MovePlayerToDestination();
@@ -315,6 +336,55 @@ void ATPlayerController::HeldAbilityAction(const FInputActionValue& Value, const
 			PossessedCharacter->AddMovementInput(WorldDirection);
 		}
 	}
+}
+
+void ATPlayerController::OnDialogueStarted(ACharacter* InPlayer, ACharacter* NPC)
+{
+	if (InPlayer != GetPawn())
+	{
+		return;
+	}
+
+	SetViewTargetWithBlend(NPC, 0.1f, VTBlend_PreBlended);
+	PlayerCameraManager->StartCameraFade(1.0f, 0.f, 2.5f, FLinearColor::Black);
+
+	if (GetPawn())
+	{
+		HiddenActors.Add(GetPawn());
+		GetPawn()->DisableInput(this);
+		StopMovement();
+		bMovingToDestination = false;
+	}
+
+	SetShowMouseCursor(true);
+	FInputModeUIOnly InputMode;
+
+	SetInputMode(InputMode);
+
+	bIsInDialogue = true;
+}
+
+void ATPlayerController::OnDialogueEnded(ACharacter* InPlayer)
+{
+	if (InPlayer != GetPawn())
+	{
+		return;
+	}
+
+	SetViewTargetWithBlend(InPlayer, 0.45f, VTBlend_Cubic);
+
+	if (GetPawn())
+	{
+		HiddenActors.Remove(GetPawn());
+		GetPawn()->EnableInput(this);
+	}
+
+	SetShowMouseCursor(true);
+	FInputModeGameAndUI InputMode;
+
+	SetInputMode(InputMode);
+
+	bIsInDialogue = false;
 }
 
 UTAbilitySystemComponent* ATPlayerController::GetTASC()

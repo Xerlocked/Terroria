@@ -8,15 +8,13 @@
 #include "PlayerDialogueComponent.generated.h"
 
 // 대화 시작 - UI에게 "대화창 열어라" 신호
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLocalDialogStarted,
-                                            ACharacter*, NPC);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLocalDialogStartedDelegate, ACharacter* /* Player */, ACharacter* /* NPC */);
 
 // 노드 변경 - UI에게 "이 내용 보여줘라" 신호
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLocalNodeChanged,
-                                            const FDialogueNode&, Node);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLocalNodeChangedDelegate, const FDialogueNode& /* Node */);
 
 // 대화 종료 - UI에게 "대화창 닫아라" 신호
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLocalDialogueEnded);
+DECLARE_MULTICAST_DELEGATE(FOnLocalDialogueEndedDelegate);
 
 UCLASS(ClassGroup=(Dialogue), meta=(BlueprintSpawnableComponent))
 class TERRORIA_API UPlayerDialogueComponent : public UActorComponent
@@ -26,14 +24,11 @@ class TERRORIA_API UPlayerDialogueComponent : public UActorComponent
 public:
 	UPlayerDialogueComponent();
 
-	UPROPERTY(BlueprintAssignable, Category = "Dialogue|Events")
-	FOnLocalDialogStarted OnLocalDialogueStarted;
+	FOnLocalDialogStartedDelegate OnLocalDialogueStarted;
 
-	UPROPERTY(BlueprintAssignable, Category = "Dialogue|Events")
-	FOnLocalNodeChanged OnLocalNodeChanged;
+	FOnLocalNodeChangedDelegate OnLocalNodeChanged;
 
-	UPROPERTY(BlueprintAssignable, Category = "Dialogue|Events")
-	FOnLocalDialogueEnded OnLocalDialogueEnded;
+	FOnLocalDialogueEndedDelegate OnLocalDialogueEnded;
 
 	UFUNCTION(BlueprintCallable)
 	void TryInteract(ACharacter* TargetNPC);
