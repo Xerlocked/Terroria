@@ -214,4 +214,9 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.State_Death = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("State.Death"),
 		FString("Death State"));
+
+	// Event
+	GameplayTags.Event_Kill = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Kill"),
+		FString("Event Kill"));
 }

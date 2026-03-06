@@ -246,6 +246,7 @@ public:
 private:
 	void GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property);
 	void SendXPEvent(const FEffectProperty& Property);
+	void SendDeathEvent(const FEffectProperty& Property);
 
 	bool bNeedMaxHealth = false;
 	bool bNeedMaxMana = false;

@@ -185,6 +185,7 @@ void UTAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCa
 					CharacterData->Die();
 				}
 				SendXPEvent(EffectProperty);
+				SendDeathEvent(EffectProperty);
 			}
 		}
 	}
@@ -254,6 +255,28 @@ void UTAttributeSet::SendXPEvent(const FEffectProperty& Property)
 		Payload.EventMagnitude = XPReward;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Property.InstigatorCharacter,
 		                                                         GameplayTags.Attribute_Meta_IncomingXP, Payload);
+	}
+}
+
+void UTAttributeSet::SendDeathEvent(const FEffectProperty& Property)
+{
+	if (Property.InstigatorCharacter && Property.TargetASC)
+	{
+		FGameplayTagContainer TargetTags;
+		Property.TargetASC->GetOwnedGameplayTags(TargetTags);
+		FGameplayTag KillEventTag = FTGameplayTags::Get().Event_Kill;
+
+		for (const FGameplayTag& Tag : TargetTags)
+		{
+			if (Tag.MatchesTag(KillEventTag))
+			{
+				FGameplayEventData Payload;
+				Payload.EventTag = Tag;
+				Payload.EventMagnitude = 1.0f;
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Property.InstigatorCharacter, Tag, Payload);
+				break;
+			}
+		}
 	}
 }
 

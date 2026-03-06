@@ -6,8 +6,10 @@
 #include "AttributeSet.h"
 #include "TCharacterBase.h"
 #include "Interface/PlayerInterface.h"
+#include "QuestSystem/Interface/QuestReceiver.h"
 #include "TPlayerCharacter.generated.h"
 
+class UQuestReceiverComponent;
 class UPlayerDialogueComponent;
 class UDialogueComponent;
 class USphereComponent;
@@ -20,7 +22,7 @@ class USpringArmComponent;
 class UInputAction;
 
 UCLASS()
-class TERRORIA_API ATPlayerCharacter : public ATCharacterBase, public IPlayerInterface
+class TERRORIA_API ATPlayerCharacter : public ATCharacterBase, public IPlayerInterface, public IQuestReceiver
 {
 	GENERATED_BODY()
 
@@ -75,6 +77,17 @@ public:
 	virtual void UpgradeAbilityByTag_Implementation(const FGameplayTag& AbilityTag) override;
 	// End Player Interface
 
+	// Begin Quest Receiver
+
+	virtual UQuestReceiverComponent* GetQuestReceiverComponent() const override;
+
+	virtual void AddExperience(int32 Amount) override;
+	virtual void AddCurrency(int32 Amount) override;
+	virtual void AddItem(FName ItemID, int32 Quantity) override;
+	virtual void AddGameplayTag(FGameplayTag Tag) override;
+
+	// End Quest Receiver
+
 	void ProcessInteraction();
 
 	AActor* GetInteractionActor() const { return InteractionActor; }
@@ -114,6 +127,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UPlayerDialogueComponent> LocalDialogueComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UQuestReceiverComponent> QuestReceiverComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere, Replicated)

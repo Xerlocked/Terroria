@@ -73,6 +73,8 @@ struct FTGameplayTags
 	FGameplayTag State_Attacking;
 	FGameplayTag State_Death;
 
+	FGameplayTag Event_Kill;
+
 private:
 	static FTGameplayTags GameplayTags;
 };

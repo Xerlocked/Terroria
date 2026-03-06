@@ -160,8 +160,7 @@ bool UDialogueManagerSubsystem::EvaluateConditions(ACharacter* Player,
 			break;
 
 		case EDialogueConditionType::QuestStatus:
-			//bResult = QuestManager &&
-			// 	QuestManager->GetQuestStatus(Condition.TargetQuestID) == Condition.RequiredStatus;
+			bResult = QuestManager && QuestManager->GetQuestStatus(Condition.TargetQuestID) == Condition.RequiredStatus;
 			break;
 
 		case EDialogueConditionType::HasItem:
@@ -213,8 +212,7 @@ void UDialogueManagerSubsystem::ProcessEvents(ACharacter* Player, const TArray<F
 		return;
 	}
 
-	UQuestManagerSubsystem* QuestManager =
-		Player->GetGameInstance()->GetSubsystem<UQuestManagerSubsystem>();
+	UQuestManagerSubsystem* QuestManager = Player->GetGameInstance()->GetSubsystem<UQuestManagerSubsystem>();
 
 	for (const FDialogueEvent& Event : Events)
 	{
@@ -226,21 +224,21 @@ void UDialogueManagerSubsystem::ProcessEvents(ACharacter* Player, const TArray<F
 		case EDialogueEventType::StartQuest:
 			if (QuestManager)
 			{
-				// QuestManager->AcceptQuest(Event.QuestID);
+				QuestManager->AcceptQuest(Event.QuestID);
 			}
 			break;
 
 		case EDialogueEventType::CompleteObjective:
 			if (QuestManager)
 			{
-				// QuestManager->UpdateObjective(Event.QuestID, Event.ObjectiveID, 1);
+				QuestManager->UpdateObjective(Event.QuestID, Event.ObjectiveID, 1);
 			}
 			break;
 
 		case EDialogueEventType::CompleteQuest:
 			if (QuestManager)
 			{
-				// QuestManager->CompleteQuest(Event.QuestID);
+				QuestManager->CompleteQuest(Event.QuestID);
 			}
 			break;
 

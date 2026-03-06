@@ -6,6 +6,8 @@
 #include "GameplayTagContainer.h"
 #include "DialogueSystemTypes.generated.h"
 
+enum class EQuestStatus : uint8;
+
 UENUM(BlueprintType)
 enum class EDialogueConditionType : uint8
 {
@@ -42,8 +44,8 @@ struct FDialogueCondition
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName TargetQuestID = NAME_None;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	// EQuestStatus RequiredStatus;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EQuestStatus RequiredStatus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag RequiredTag = FGameplayTag();
@@ -62,6 +64,9 @@ struct FDialogueEvent
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName QuestID = NAME_None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName ObjectiveID = NAME_None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName ItemID = NAME_None;

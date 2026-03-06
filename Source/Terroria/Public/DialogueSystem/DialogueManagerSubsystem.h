@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Data/DialogueNode.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "DialogueSystem/Data/DialogueNode.h"
 #include "DialogueManagerSubsystem.generated.h"
 
 class ACharacter;

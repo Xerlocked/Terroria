@@ -7,6 +7,7 @@
 #include "Interface/Interactable.h"
 #include "TNonPlayerCharacter.generated.h"
 
+class UQuestGiverComponent;
 class UNPCDialogueComponent;
 class UWidgetComponent;
 class UDialogueDataAsset;
@@ -46,6 +47,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
 	TObjectPtr<UWidgetComponent> InteractionWidgetComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|UI")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Dialogue")
 	TObjectPtr<UNPCDialogueComponent> DialogueComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character|Quest")
+	TObjectPtr<UQuestGiverComponent> QuestGiverComponent;
 };

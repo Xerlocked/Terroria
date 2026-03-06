@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "DialogueSystem/NPCDialogueComponent.h"
 #include "DialogueSystem/PlayerDialogueComponent.h"
+#include "QuestSystem/QuestGiverComponent.h"
 
 
 ATNonPlayerCharacter::ATNonPlayerCharacter()
@@ -32,6 +33,8 @@ ATNonPlayerCharacter::ATNonPlayerCharacter()
 	InteractionWidgetComponent->SetupAttachment(GetRootComponent());
 
 	DialogueComponent = CreateDefaultSubobject<UNPCDialogueComponent>("DialogueComponent");
+
+	QuestGiverComponent = CreateDefaultSubobject<UQuestGiverComponent>("QuestGiverComponent");
 }
 
 void ATNonPlayerCharacter::BeginPlay()

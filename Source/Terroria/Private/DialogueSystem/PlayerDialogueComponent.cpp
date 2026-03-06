@@ -22,14 +22,11 @@ void UPlayerDialogueComponent::BeginPlay()
 		return;
 	}
 
-	DialogueManager->OnDialogueStarted.AddDynamic(
-		this, &UPlayerDialogueComponent::OnDialogueStarted);
+	DialogueManager->OnDialogueStarted.AddDynamic(this, &UPlayerDialogueComponent::OnDialogueStarted);
 
-	DialogueManager->OnDialogueEnded.AddDynamic(
-		this, &UPlayerDialogueComponent::OnDialogueEnded);
+	DialogueManager->OnDialogueEnded.AddDynamic(this, &UPlayerDialogueComponent::OnDialogueEnded);
 
-	DialogueManager->OnNodeChanged.AddDynamic(
-		this, &UPlayerDialogueComponent::OnNodeChanged);
+	DialogueManager->OnNodeChanged.AddDynamic(this, &UPlayerDialogueComponent::OnNodeChanged);
 }
 
 void UPlayerDialogueComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

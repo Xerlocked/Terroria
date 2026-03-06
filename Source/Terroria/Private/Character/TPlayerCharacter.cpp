@@ -17,6 +17,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/TPlayerController.h"
 #include "Player/TPlayerState.h"
+#include "QuestSystem/QuestReceiverComponent.h"
 #include "UI/HUD/THUD.h"
 
 ATPlayerCharacter::ATPlayerCharacter()
@@ -51,6 +52,8 @@ ATPlayerCharacter::ATPlayerCharacter()
 	InteractionCollision->SetCollisionProfileName(TEXT("TriggerAllDynamic"));
 
 	LocalDialogueComponent = CreateDefaultSubobject<UPlayerDialogueComponent>("LocalDialogueComponent");
+
+	QuestReceiverComponent = CreateDefaultSubobject<UQuestReceiverComponent>("QuestReceiverComponent");
 
 	CharacterClass = ECharacterClass::Magician;
 }
@@ -243,6 +246,27 @@ void ATPlayerCharacter::UpgradeAbilityByTag_Implementation(const FGameplayTag& A
 			break;
 		}
 	}
+}
+
+UQuestReceiverComponent* ATPlayerCharacter::GetQuestReceiverComponent() const
+{
+	return QuestReceiverComponent;
+}
+
+void ATPlayerCharacter::AddExperience(int32 Amount)
+{
+}
+
+void ATPlayerCharacter::AddCurrency(int32 Amount)
+{
+}
+
+void ATPlayerCharacter::AddItem(FName ItemID, int32 Quantity)
+{
+}
+
+void ATPlayerCharacter::AddGameplayTag(FGameplayTag Tag)
+{
 }
 
 void ATPlayerCharacter::ProcessInteraction()
