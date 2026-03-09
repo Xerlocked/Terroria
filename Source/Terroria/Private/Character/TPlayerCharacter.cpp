@@ -259,6 +259,9 @@ void ATPlayerCharacter::AddExperience(int32 Amount)
 
 void ATPlayerCharacter::AddCurrency(int32 Amount)
 {
+	ATPlayerState* TPlayerState = GetPlayerState<ATPlayerState>();
+	check(TPlayerState);
+	TPlayerState->AddToGold(Amount);
 }
 
 void ATPlayerCharacter::AddItem(FName ItemID, int32 Quantity)

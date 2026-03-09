@@ -126,8 +126,8 @@ bool UNPCDialogueComponent::EvaluateConditions(ACharacter* Player, const TArray<
 			bResult = true;
 			break;
 		case EDialogueConditionType::QuestStatus:
-			// bResult = QuestManager &&
-			//		  QuestManager->GetQuestStatus(Condition.TargetQuestID) == Condition.RequiredStatus;
+			bResult = QuestManager &&
+				QuestManager->GetQuestStatus(Condition.TargetQuestID) == Condition.RequiredStatus;
 			break;
 		case EDialogueConditionType::HasItem:
 			// bResult = Player->GetInventory()->HasItem(Condition.RequiredItemID);

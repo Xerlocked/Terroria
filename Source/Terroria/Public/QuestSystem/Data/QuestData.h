@@ -25,7 +25,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText QuestDescription;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FQuestObjective> QuestObjectives;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -33,6 +33,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FName> PreRequiredQuests;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bRequireReturnToNPC = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsMainQuest = false;

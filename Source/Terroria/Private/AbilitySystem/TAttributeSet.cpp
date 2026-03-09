@@ -81,8 +81,6 @@ void UTAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 	if (Attribute == GetManaAttribute())
 	{
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
-
-		UE_LOG(LogTemp, Log, TEXT("Health value %f"), NewValue);
 	}
 
 	if (Attribute == GetMovementSpeedAttribute())
@@ -93,8 +91,6 @@ void UTAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 		if (Character && Character->GetCharacterMovement())
 		{
 			Character->GetCharacterMovement()->MaxWalkSpeed = NewValue;
-
-			UE_LOG(LogTemp, Log, TEXT("MaxWalkSpeed Value: %f"), NewValue);
 		}
 	}
 }

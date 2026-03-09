@@ -12,6 +12,7 @@
 #include "DialogueSystem/PlayerDialogueComponent.h"
 #include "Player/TPlayerController.h"
 #include "Player/TPlayerState.h"
+#include "QuestSystem/QuestReceiverComponent.h"
 
 void UTOverlayWidgetController::BroadcastInitialValues()
 {
@@ -74,6 +75,24 @@ void UTOverlayWidgetController::BindCallbacksToDependencies()
 		{
 			OnDialogueNodeChanged.Broadcast(Node);
 		});
+
+		TPlayerCharacter->GetQuestReceiverComponent()->OnLocalQuestStatusChanged.AddLambda(
+			[this](FName QuestID, EQuestStatus NewStatus)
+			{
+				OnQuestStatusChanged.Broadcast(QuestID, NewStatus);
+			});
+
+		TPlayerCharacter->GetQuestReceiverComponent()->OnLocalObjectiveCompleted.AddLambda(
+			[this](FName QuestID, FName ObjectiveID)
+			{
+				OnObjectiveCompleted.Broadcast(QuestID, ObjectiveID);
+			});
+
+		TPlayerCharacter->GetQuestReceiverComponent()->OnLocalObjectiveUpdated.AddLambda([this](
+			FName QuestID, FName ObjectiveID, int32 CurrentCount)
+			{
+				OnObjectiveUpdated.Broadcast(QuestID, ObjectiveID, CurrentCount);
+			});
 	}
 
 	// ASC

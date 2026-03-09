@@ -121,6 +121,8 @@ public:
 
 	UPlayerDialogueComponent* GetLocalDialogueComponent() const { return LocalDialogueComponent; }
 
+	UQuestReceiverComponent* GetQuestReceiverComponent() { return QuestReceiverComponent; }
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities|Mapping")
 	TMap<FGameplayTag, FGameplayAttribute> TagToAttributeMap;

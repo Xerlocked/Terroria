@@ -335,7 +335,21 @@ void UQuestManagerSubsystem::CheckQuestCompletion(FName QuestID)
 	// 전체 완료
 	if (bAllRequiredComplete)
 	{
-		CompleteQuest(QuestID);
+		if (!QuestData->bRequireReturnToNPC)
+		{
+			CompleteQuest(QuestID);
+		}
+		else
+		{
+			// 위 일부 완료 상태 갱신은 목표가 1개일 경우 검사안하고 바로 완료로 가는 경우 방지
+			// NPC에게 돌아가야 하는 퀘스트는 목표 완료 상태로 변경
+			FQuestState* State = QuestStateMap.Find(QuestID);
+			if (State && State->Status == EQuestStatus::Active)
+			{
+				State->Status = EQuestStatus::ObjectiveComplete;
+				OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::ObjectiveComplete);
+			}
+		}
 	}
 }
 

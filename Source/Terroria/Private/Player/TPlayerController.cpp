@@ -356,11 +356,6 @@ void ATPlayerController::OnDialogueStarted(ACharacter* InPlayer, ACharacter* NPC
 		bMovingToDestination = false;
 	}
 
-	SetShowMouseCursor(true);
-	FInputModeUIOnly InputMode;
-
-	SetInputMode(InputMode);
-
 	bIsInDialogue = true;
 }
 
@@ -378,11 +373,6 @@ void ATPlayerController::OnDialogueEnded(ACharacter* InPlayer)
 		HiddenActors.Remove(GetPawn());
 		GetPawn()->EnableInput(this);
 	}
-
-	SetShowMouseCursor(true);
-	FInputModeGameAndUI InputMode;
-
-	SetInputMode(InputMode);
 
 	bIsInDialogue = false;
 }

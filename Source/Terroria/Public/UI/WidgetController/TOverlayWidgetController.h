@@ -41,6 +41,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNodeChangedSignature, const FDial
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDialogueEndedSignature);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestStatusChangedSignature, FName, QuestID, EQuestStatus, NewStatus);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveCompletedSignature, FName, QuestID, FName, ObjectiveID);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnObjectiveUpdatedSignature, FName, QuestID, FName, ObjectiveID, int32,
+                                               CurrentCount);
+
 /**
  * 
  */
@@ -95,6 +102,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Dialogue")
 	FOnDialogueEndedSignature OnDialogueEnded;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Quest")
+	FOnQuestStatusChangedSignature OnQuestStatusChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Quest")
+	FOnObjectiveCompletedSignature OnObjectiveCompleted;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Quest")
+	FOnObjectiveUpdatedSignature OnObjectiveUpdated;
 
 protected:
 	template <typename T>
