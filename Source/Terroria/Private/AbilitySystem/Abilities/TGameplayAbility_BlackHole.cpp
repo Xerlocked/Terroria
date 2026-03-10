@@ -47,8 +47,32 @@ void UTGameplayAbility_BlackHole::OnTargetDataReady(const FGameplayAbilityTarget
 	{
 		CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 
+		FVector TargetLocation = HitResult->Location;
+
+		FHitResult GroundHit;
+
+		FVector TraceStart = TargetLocation + FVector(0.f, 0.f, 100.f);
+		FVector TraceEnd = TargetLocation - FVector(0.f, 0.f, 2000.f);
+
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(GetAvatarActorFromActorInfo());
+		if (HitResult->GetActor())
+		{
+			QueryParams.AddIgnoredActor(HitResult->GetActor());
+		}
+
+		bool bHitGround = GetWorld()->LineTraceSingleByChannel(
+			GroundHit,
+			TraceStart,
+			TraceEnd,
+			ECC_WorldStatic,
+			QueryParams
+		);
+
+		FVector FinalLocation = bHitGround ? GroundHit.Location : TargetLocation;
+
 		FTransform SpawnTransform = FTransform::Identity;
-		SpawnTransform.SetLocation(HitResult->Location);
+		SpawnTransform.SetLocation(FinalLocation);
 
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
 			GetAvatarActorFromActorInfo());
