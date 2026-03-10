@@ -115,7 +115,7 @@ bool UGameplayInputQueueSystem::AddInputToBuffer(const FGameplayTag& InputTag)
 	}
 
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
-	const FBufferedInput NewInput(InputTag, CurrentTime, Duration, Priority);
+	const FBufferedInput NewInput(InputTag, CurrentTime, Priority, Duration);
 	InputQueue.Add(NewInput);
 
 	if (bShowDebug)
