@@ -43,8 +43,6 @@ void ATNonPlayerCharacter::BeginPlay()
 	SetupAbilityActorInfo();
 	AddCharacterAbilities();
 	UTAbilitySystemLibrary::GiveCommonAbilities(this, AbilitySystemComponent);
-
-	InteractionWidgetComponent->SetVisibility(false);
 }
 
 void ATNonPlayerCharacter::Interact_Implementation(APawn* InstigatorPawn)
@@ -57,12 +55,10 @@ void ATNonPlayerCharacter::Interact_Implementation(APawn* InstigatorPawn)
 
 void ATNonPlayerCharacter::BeginInteraction_Implementation(APawn* InstigatorPawn)
 {
-	InteractionWidgetComponent->SetVisibility(true);
 }
 
 void ATNonPlayerCharacter::EndInteraction_Implementation()
 {
-	InteractionWidgetComponent->SetVisibility(false);
 }
 
 FVector ATNonPlayerCharacter::GetWeaponSocketLocation_Implementation(FName SocketName) const

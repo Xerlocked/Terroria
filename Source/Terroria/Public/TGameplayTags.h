@@ -42,6 +42,14 @@ struct FTGameplayTags
 	FGameplayTag Ability_Dark_Shockwave;
 	FGameplayTag Ability_Dark_BlackHole;
 
+	FGameplayTag Ability_Boss_Laser;
+	FGameplayTag Ability_Boss_JumpSlam;
+	FGameplayTag Ability_Boss_SummonMelee;
+	FGameplayTag Ability_Boss_EnterEnrage;
+	FGameplayTag Ability_Boss_Enraged_LaserSpin;
+	FGameplayTag Ability_Boss_Enraged_JumpSlamTriple;
+	FGameplayTag Ability_Boss_Enraged_SummonMixed;
+
 	FGameplayTag Cooldown_Common_Flash;
 	FGameplayTag Cooldown_Dark_LightingBolt;
 	FGameplayTag Cooldown_Dark_Shield;
@@ -49,6 +57,19 @@ struct FTGameplayTags
 	FGameplayTag Cooldown_Dark_BlackHole;
 	FGameplayTag Cooldown_Attack_Melee;
 	FGameplayTag Cooldown_Attack_Ranged;
+
+	FGameplayTag Cooldown_Boss_Laser;
+	FGameplayTag Cooldown_Boss_JumpSlam;
+	FGameplayTag Cooldown_Boss_Summon;
+	FGameplayTag Cooldown_Boss_Enraged_LaserSpin;
+	FGameplayTag Cooldown_Boss_Enraged_JumpSlamTriple;
+	FGameplayTag Cooldown_Boss_Enraged_SummonMixed;
+
+	FGameplayTag Block_Ability_Boss_Laser;
+	FGameplayTag Block_Ability_Boss_JumpSlam;
+	FGameplayTag Block_Ability_Boss_Summon;
+	FGameplayTag Block_Ability_Boss_NormalPattern;
+	FGameplayTag Block_Ability_Boss_EnragedPattern;
 
 	FGameplayTag Input_Mouse_LMB;
 	FGameplayTag Input_Mouse_RMB;
@@ -72,7 +93,39 @@ struct FTGameplayTags
 	FGameplayTag State_Cast_Rooted;
 	FGameplayTag State_Attacking;
 	FGameplayTag State_Death;
+	FGameplayTag State_Stunned;
+	FGameplayTag State_Idle;
+	FGameplayTag State_Search;
+	FGameplayTag State_Wander;
+	FGameplayTag State_Alert;
+	FGameplayTag State_Chase;
+	FGameplayTag State_Attack;
+	FGameplayTag State_Return;
 
+	FGameplayTag State_Boss_Normal;
+	FGameplayTag State_Boss_Enraged;
+	FGameplayTag State_Boss_Combat;
+	FGameplayTag State_Boss_Idle;
+	FGameplayTag State_Boss_Casting;
+	FGameplayTag State_Boss_Jumping;
+	FGameplayTag State_Boss_Summoning;
+	FGameplayTag State_Boss_Invulnerable;
+	FGameplayTag State_Boss_Dead;
+
+	FGameplayTag AI_HasTarget;
+	FGameplayTag AI_LostTarget;
+	FGameplayTag AI_InDetectRange;
+	FGameplayTag AI_InAttackRange;
+	FGameplayTag AI_ShouldKeepDistance;
+
+	FGameplayTag AI_Type_Melee;
+	FGameplayTag AI_Type_Ranged;
+
+	FGameplayTag Event_Boss_Health_Below50;
+	FGameplayTag Event_Boss_Pattern_Start;
+	FGameplayTag Event_Boss_Pattern_End;
+	FGameplayTag Event_Boss_Enrage_Start;
+	FGameplayTag Event_Boss_Enrage_End;
 	FGameplayTag Event_Kill;
 
 private:

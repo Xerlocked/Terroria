@@ -2,6 +2,10 @@
 
 
 #include "Helper/TerroriaBlueprintLibrary.h"
+
+#include "GameplayTagContainer.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Struct.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"

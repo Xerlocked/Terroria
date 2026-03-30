@@ -82,17 +82,6 @@ void UTAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 	{
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
 	}
-
-	if (Attribute == GetMovementSpeedAttribute())
-	{
-		AActor* OwningActor = GetOwningActor();
-		ACharacter* Character = Cast<ACharacter>(OwningActor);
-
-		if (Character && Character->GetCharacterMovement())
-		{
-			Character->GetCharacterMovement()->MaxWalkSpeed = NewValue;
-		}
-	}
 }
 
 void UTAttributeSet::GetGameplayEffectProperty(const FGameplayEffectModCallbackData& Data, FEffectProperty& Property)
@@ -233,6 +222,23 @@ void UTAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, fl
 	{
 		SetMana(GetMaxMana());
 		bNeedMaxMana = false;
+	}
+
+	if (Attribute == GetMovementSpeedAttribute())
+	{
+		if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
+		{
+			if (AActor* AvatarActor = ASC->GetAvatarActor())
+			{
+				if (ACharacter* Character = Cast<ACharacter>(AvatarActor))
+				{
+					if (UCharacterMovementComponent* CMC = Character->GetCharacterMovement())
+					{
+						CMC->MaxWalkSpeed = NewValue;
+					}
+				}
+			}
+		}
 	}
 }
 

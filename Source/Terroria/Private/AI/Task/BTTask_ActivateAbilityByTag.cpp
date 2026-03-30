@@ -10,7 +10,7 @@
 
 UBTTask_ActivateAbilityByTag::UBTTask_ActivateAbilityByTag()
 {
-	NodeName = "Activate AbilityByTag";
+	NodeName = "Activate Ability By Tag";
 	TargetActorKeySelector.AddObjectFilter(
 		this, GET_MEMBER_NAME_CHECKED(UBTTask_ActivateAbilityByTag, TargetActorKeySelector), AActor::StaticClass());
 }

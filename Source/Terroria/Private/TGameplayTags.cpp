@@ -105,6 +105,35 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Dark.BlackHole"),
 		FString("BlackHole"));
 
+	GameplayTags.Ability_Boss_Laser = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.Laser"),
+		FString("Boss Laser"));
+
+	GameplayTags.Ability_Boss_JumpSlam = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.JumpSlam"),
+		FString("Boss JumpSlam"));
+
+	GameplayTags.Ability_Boss_SummonMelee = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.SummonMelee"),
+		FString("Boss SummonMelee"));
+
+	GameplayTags.Ability_Boss_EnterEnrage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.EnterEnrage"),
+		FString("Boss EnterEnrage"));
+
+	GameplayTags.Ability_Boss_Enraged_LaserSpin = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.Enraged.LaserSpin"),
+		FString("Boss Enraged LaserSpin"));
+
+	GameplayTags.Ability_Boss_Enraged_JumpSlamTriple = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.Enraged.JumpSlamTriple"),
+		FString("Boss Enraged JumpSlamTriple"));
+
+	GameplayTags.Ability_Boss_Enraged_SummonMixed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.Enraged.SummonMixed"),
+		FString("Boss Enraged SummonMixed"));
+
+
 	// Cooldown
 	GameplayTags.Cooldown_Common_Flash = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Common.Flash"),
@@ -133,6 +162,51 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Attack_Ranged = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Attack.Ranged"),
 		FString("Ranged Attack Cooldown"));
+
+
+	GameplayTags.Cooldown_Boss_Laser = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.Laser"),
+		FString("Boss Laser Cooldown"));
+
+	GameplayTags.Cooldown_Boss_JumpSlam = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.JumpSlam"),
+		FString("Boss JumpSlam Cooldown"));
+
+	GameplayTags.Cooldown_Boss_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.Summon"),
+		FString("Boss Summon Cooldown"));
+
+	GameplayTags.Cooldown_Boss_Enraged_LaserSpin = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.Enraged.LaserSpin"),
+		FString("Boss Enraged LaserSpin Cooldown"));
+
+	GameplayTags.Cooldown_Boss_Enraged_JumpSlamTriple = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.Enraged.JumpSlamTriple"),
+		FString("Boss Enraged JumpSlamTriple Cooldown"));
+
+	GameplayTags.Cooldown_Boss_Enraged_SummonMixed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Boss.Enraged.SummonMixed"),
+		FString("Boss Enraged SummonMixed Cooldown"));
+
+	GameplayTags.Block_Ability_Boss_Laser = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Ability.Boss.Laser"),
+		FString("Block Boss Laser Ability"));
+
+	GameplayTags.Block_Ability_Boss_JumpSlam = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Ability.Boss.JumpSlam"),
+		FString("Block Boss JumpSlam Ability"));
+
+	GameplayTags.Block_Ability_Boss_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Ability.Boss.Summon"),
+		FString("Block Boss Summon Ability"));
+
+	GameplayTags.Block_Ability_Boss_NormalPattern = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Ability.Boss.NormalPattern"),
+		FString("Block Boss Normal Pattern"));
+
+	GameplayTags.Block_Ability_Boss_EnragedPattern = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Ability.Boss.EnragedPattern"),
+		FString("Block Boss Enraged Pattern"));
 
 	// Input Action Tags
 	GameplayTags.Input_Mouse_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -215,8 +289,125 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 		FName("State.Death"),
 		FString("Death State"));
 
+	GameplayTags.State_Stunned = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Stunned"),
+		FString("Stunned State"));
+
+	GameplayTags.State_Idle = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Idle"),
+		FString("Idle State"));
+
+	GameplayTags.State_Search = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Search"),
+		FString("Search State"));
+
+	GameplayTags.State_Wander = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Wander"),
+		FString("Wander State"));
+
+	GameplayTags.State_Alert = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Alert"),
+		FString("Alert State"));
+
+	GameplayTags.State_Chase = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Chase"),
+		FString("Chase State"));
+
+	GameplayTags.State_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Attack"),
+		FString("Attack State"));
+
+	GameplayTags.State_Return = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Return"),
+		FString("Return State"));
+
+	GameplayTags.State_Boss_Normal = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Normal"),
+		FString("Boss Normal State"));
+
+	GameplayTags.State_Boss_Enraged = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Enraged"),
+		FString("Boss Enraged State"));
+
+	GameplayTags.State_Boss_Combat = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Combat"),
+		FString("Boss Combat State"));
+
+	GameplayTags.State_Boss_Idle = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Idle"),
+		FString("Boss Idle State"));
+
+	GameplayTags.State_Boss_Casting = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Casting"),
+		FString("Boss Casting State"));
+
+	GameplayTags.State_Boss_Jumping = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Jumping"),
+		FString("Boss Jumping State"));
+
+	GameplayTags.State_Boss_Summoning = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Summoning"),
+		FString("Boss Summoning State"));
+
+	GameplayTags.State_Boss_Invulnerable = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Invulnerable"),
+		FString("Boss Invulnerable State"));
+
+	GameplayTags.State_Boss_Dead = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Boss.Dead"),
+		FString("Boss Dead State"));
+
+	// AI Tags
+	GameplayTags.AI_HasTarget = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.HasTarget"),
+		FString("AI Has Target"));
+
+	GameplayTags.AI_LostTarget = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.LostTarget"),
+		FString("AI Lost Target"));
+
+	GameplayTags.AI_InDetectRange = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.InDetectRange"),
+		FString("AI In Detect Range"));
+
+	GameplayTags.AI_InAttackRange = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.InAttackRange"),
+		FString("AI In Attack Range"));
+
+	GameplayTags.AI_ShouldKeepDistance = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.ShouldKeepDistance"),
+		FString("AI Should Keep Distance"));
+
+	GameplayTags.AI_Type_Melee = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.Type.Melee"),
+		FString("AI Type Melee"));
+
+	GameplayTags.AI_Type_Ranged = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("AI.Type.Ranged"),
+		FString("AI Type Ranged"));
+
 	// Event
 	GameplayTags.Event_Kill = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Kill"),
 		FString("Event Kill"));
+
+	GameplayTags.Event_Boss_Health_Below50 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Health.Below50"),
+		FString("Boss Health Below 50%"));
+
+	GameplayTags.Event_Boss_Pattern_Start = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Pattern.Start"),
+		FString("Boss Pattern Start"));
+
+	GameplayTags.Event_Boss_Pattern_End = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Pattern.End"),
+		FString("Boss Pattern End"));
+
+	GameplayTags.Event_Boss_Enrage_Start = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Enrage.Start"),
+		FString("Boss Enrage Start"));
+
+	GameplayTags.Event_Boss_Enrage_End = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Enrage.End"),
+		FString("Boss Enrage End"));
 }

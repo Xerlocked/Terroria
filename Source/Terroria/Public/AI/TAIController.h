@@ -10,8 +10,35 @@ struct FAIStimulus;
 
 struct FAIKey
 {
+	// Object
 	static const FName TargetActor;
+
+	// Vector
+	static const FName SpawnLocation;
+	static const FName HomeLocation;
+	static const FName LastKnownTargetLocation;
+	static const FName MoveTargetLocation;
+	static const FName PatrolPoint;
+	static const FName RangedAttackPosition;
+
+	// Bool
+	static const FName bHasLOS;
+	static const FName bInAttackRange;
+	static const FName bInDetectRange;
+	static const FName bNeedReturn;
+	static const FName bReachedHome;
+	static const FName bHasValidTarget;
+	static const FName bShouldSearch;
+	static const FName bCanWander;
+	static const FName bShouldKeepDistance;
+
+	// Float
+	static const FName DistanceToTarget;
+	static const FName SearchElapsedTime;
+	static const FName AttackCooldownRemaining;
+	static const FName TargetLocationScore;
 	static const FName AttackRange;
+	static const FName LeashRadius;
 };
 
 /**

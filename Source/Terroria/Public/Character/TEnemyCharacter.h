@@ -4,9 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TCharacterBase.h"
-#include "AbilitySystem/Data/TCharacterClassDataAsset.h"
 #include "Interface/Highlight.h"
-#include "Interface/Interactable.h"
 #include "UI/WidgetController/TOverlayWidgetController.h"
 #include "TEnemyCharacter.generated.h"
 
@@ -32,8 +30,11 @@ public:
 	virtual FVector GetWeaponSocketLocation_Implementation(FName SocketName) const override;
 	virtual int32 GetPlayerLevel_Implementation() const override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Combat")
-	float PrimaryAttackRange = 150.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
+	float AttackRange = 150.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|AI")
+	float LeashRadius = 1500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	float BaseWalkSpeed = 250.f;
@@ -52,6 +53,8 @@ protected:
 	virtual void SpawnDropItem() override;
 
 	virtual void HandleDeath_Implementation() override;
+
+	virtual void OnDeathTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Status")
 	int32 Level = 1;

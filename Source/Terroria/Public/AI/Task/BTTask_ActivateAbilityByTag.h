@@ -6,6 +6,7 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_ActivateAbilityByTag.generated.h"
 
+class UGameplayAbility;
 /**
  * 
  */

@@ -2,11 +2,14 @@
 
 #include "Character/TEnemyCharacter.h"
 
+#include "AIController.h"
+#include "BrainComponent.h"
 #include "Terroria.h"
 #include "TGameplayTags.h"
 #include "AbilitySystem/TAbilitySystemComponent.h"
 #include "AbilitySystem/TAbilitySystemLibrary.h"
 #include "AbilitySystem/TAttributeSet.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
@@ -158,6 +161,7 @@ void ATEnemyCharacter::HandleDeath_Implementation()
 
 		if (GetController())
 		{
+			GetController()->SetLifeSpan(LifeSpan);
 			GetController()->UnPossess();
 		}
 
@@ -171,5 +175,21 @@ void ATEnemyCharacter::HandleDeath_Implementation()
 		}
 
 		InteractionCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ATEnemyCharacter::OnDeathTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		if (AAIController* AIC = Cast<AAIController>(GetController()))
+		{
+			UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(AIC->GetBrainComponent());
+			if (BTComponent)
+			{
+				BTComponent->StopTree();
+			}
+		}
+		HandleDeath();
 	}
 }

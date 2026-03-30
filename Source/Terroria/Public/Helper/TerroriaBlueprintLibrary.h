@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TerroriaBlueprintLibrary.generated.h"
 
+class UBlackboardComponent;
 class ATHUD;
 class UCapsuleComponent;
 /**
