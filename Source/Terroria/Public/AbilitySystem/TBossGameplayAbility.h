@@ -6,6 +6,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "TBossGameplayAbility.generated.h"
 
+class AAIController;
 /**
  * 
  */
@@ -13,4 +14,7 @@ UCLASS()
 class TERRORIA_API UTBossGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+public:
+	UTBossGameplayAbility();
 };

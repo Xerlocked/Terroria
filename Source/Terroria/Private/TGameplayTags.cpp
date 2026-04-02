@@ -410,4 +410,28 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Event_Boss_Enrage_End = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Boss.Enrage.End"),
 		FString("Boss Enrage End"));
+
+	GameplayTags.Event_Boss_Laser = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Laser"),
+		FString("Boss Laser Event"));
+
+	GameplayTags.Event_Boss_JumpSlam = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.JumpSlam"),
+		FString("Boss JumpSlam Event"));
+
+	GameplayTags.Event_Boss_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Summon"),
+		FString("Boss Summon Event"));
+
+	GameplayTags.Event_Boss_Enraged_LaserSpin = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Enraged.LaserSpin"),
+		FString("Boss Enraged LaserSpin Event"));
+
+	GameplayTags.Event_Boss_Enraged_JumpSlamTriple = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Enraged.JumpSlamTriple"),
+		FString("Boss Enraged JumpSlamTriple Event"));
+
+	GameplayTags.Event_Boss_Enraged_SummonMixed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Enraged.SummonMixed"),
+		FString("Boss Enraged SummonMixed Event"));
 }

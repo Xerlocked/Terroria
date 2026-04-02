@@ -126,6 +126,12 @@ struct FTGameplayTags
 	FGameplayTag Event_Boss_Pattern_End;
 	FGameplayTag Event_Boss_Enrage_Start;
 	FGameplayTag Event_Boss_Enrage_End;
+	FGameplayTag Event_Boss_Laser;
+	FGameplayTag Event_Boss_JumpSlam;
+	FGameplayTag Event_Boss_Summon;
+	FGameplayTag Event_Boss_Enraged_LaserSpin;
+	FGameplayTag Event_Boss_Enraged_JumpSlamTriple;
+	FGameplayTag Event_Boss_Enraged_SummonMixed;
 	FGameplayTag Event_Kill;
 
 private:
