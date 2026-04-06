@@ -45,6 +45,7 @@ struct FTGameplayTags
 	FGameplayTag Ability_Boss_Laser;
 	FGameplayTag Ability_Boss_JumpSlam;
 	FGameplayTag Ability_Boss_SummonMelee;
+	FGameplayTag Ability_Boss_Shockwave;
 	FGameplayTag Ability_Boss_EnterEnrage;
 	FGameplayTag Ability_Boss_Enraged_LaserSpin;
 	FGameplayTag Ability_Boss_Enraged_JumpSlamTriple;
@@ -128,6 +129,7 @@ struct FTGameplayTags
 	FGameplayTag Event_Boss_Enrage_End;
 	FGameplayTag Event_Boss_Laser;
 	FGameplayTag Event_Boss_JumpSlam;
+	FGameplayTag Event_Boss_Shockwave;
 	FGameplayTag Event_Boss_Summon;
 	FGameplayTag Event_Boss_Enraged_LaserSpin;
 	FGameplayTag Event_Boss_Enraged_JumpSlamTriple;

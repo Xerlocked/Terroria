@@ -117,6 +117,10 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Boss.SummonMelee"),
 		FString("Boss SummonMelee"));
 
+	GameplayTags.Ability_Boss_Shockwave = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Boss.Shockwave"),
+		FString("Boss Shockwave"));
+
 	GameplayTags.Ability_Boss_EnterEnrage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Ability.Boss.EnterEnrage"),
 		FString("Boss EnterEnrage"));
@@ -422,6 +426,10 @@ void FTGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Event_Boss_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Boss.Summon"),
 		FString("Boss Summon Event"));
+
+	GameplayTags.Event_Boss_Shockwave = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Boss.Shockwave"),
+		FString("Boss Shockwave Event"));
 
 	GameplayTags.Event_Boss_Enraged_LaserSpin = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Boss.Enraged.LaserSpin"),
