@@ -15,7 +15,6 @@ void UQuestGiverComponent::BeginPlay()
 	Super::BeginPlay();
 
 	QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestManagerSubsystem>();
-
 	if (!QuestManager)
 	{
 		UE_LOG(LogTemp, Error, TEXT("QuestGiverComponent: QuestManagerSubsystem 없음"));
@@ -25,6 +24,17 @@ void UQuestGiverComponent::BeginPlay()
 	// OfferedQuests의 데이터를 QuestManager에 자동 등록
 	// NPC가 스폰될 때 자신이 가진 퀘스트 데이터를 등록함
 	QuestManager->RegisterQuestDataArray(OfferedQuests);
+
+	QuestManager->OnQuestStatusChanged.AddDynamic(this, &UQuestGiverComponent::HandleQuestStatusChanged);
+}
+
+void UQuestGiverComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (QuestManager)
+	{
+		QuestManager->OnQuestStatusChanged.RemoveDynamic(this, &UQuestGiverComponent::HandleQuestStatusChanged);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 bool UQuestGiverComponent::EnsureQuestManager() const
@@ -35,6 +45,30 @@ bool UQuestGiverComponent::EnsureQuestManager() const
 		return false;
 	}
 	return true;
+}
+
+void UQuestGiverComponent::HandleQuestStatusChanged(FName QuestID, EQuestStatus NewStatus)
+{
+	const bool bIsOwnQuest = OfferedQuests.ContainsByPredicate(
+		[&](const UQuestData* Q) { return Q && Q->QuestName == QuestID; });
+
+	const bool bIsPrerequisiteOfOwn = OfferedQuests.ContainsByPredicate(
+		[&](const UQuestData* Q)
+		{
+			return Q && Q->PreRequiredQuests.Contains(QuestID);
+		});
+
+	if (!bIsOwnQuest && !bIsPrerequisiteOfOwn)
+	{
+		return;
+	}
+
+	const ENPCMarkerState NewMarker = GetMarkerState();
+	if (NewMarker != CachedMarkerState)
+	{
+		CachedMarkerState = NewMarker;
+		OnQuestMarkerStateChanged.Broadcast(NewMarker);
+	}
 }
 
 TArray<UQuestData*> UQuestGiverComponent::GetAvailableQuests() const
@@ -109,6 +143,29 @@ TArray<UQuestData*> UQuestGiverComponent::GetActiveQuests() const
 	}
 
 	return Result;
+}
+
+bool UQuestGiverComponent::HasPendingChainQuest() const
+{
+	if (!EnsureQuestManager())
+	{
+		return false;
+	}
+
+	for (const UQuestData* QuestData : OfferedQuests)
+	{
+		if (!QuestData)
+		{
+			continue;
+		}
+
+		if (QuestManager->IsQuestPendingPrerequisite(QuestData->QuestName))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool UQuestGiverComponent::HasAvailableQuest() const

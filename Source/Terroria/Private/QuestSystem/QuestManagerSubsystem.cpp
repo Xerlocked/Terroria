@@ -93,6 +93,31 @@ bool UQuestManagerSubsystem::CompleteQuest(FName QuestID)
 		return false;
 	}
 
+	// Active 또는 ObjectiveComplete 상태에서만 완료 가능
+	if (State->Status != EQuestStatus::Active &&
+		State->Status != EQuestStatus::ObjectiveComplete)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CompleteQuest: %s 는 완료 가능한 상태가 아님 (Status=%d)"),
+		       *QuestID.ToString(), static_cast<int32>(State->Status));
+		return false;
+	}
+
+	// 모든 필수 목표가 완료되었는지 최종 검증
+	const UQuestData* QuestData = QuestDataMap.FindRef(QuestID);
+	if (QuestData)
+	{
+		for (const FQuestObjective& Objective : QuestData->QuestObjectives)
+		{
+			if (!Objective.bIsOptional && !IsObjectiveComplete(QuestID, Objective))
+			{
+				UE_LOG(LogTemp, Warning,
+				       TEXT("CompleteQuest: %s - 필수 목표 %s 가 미완료 상태"),
+				       *QuestID.ToString(), *Objective.ObjectiveID.ToString());
+				return false;
+			}
+		}
+	}
+
 	State->Status = EQuestStatus::Completed;
 
 	GrantRewards(QuestID);
@@ -100,6 +125,14 @@ bool UQuestManagerSubsystem::CompleteQuest(FName QuestID)
 	OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::Completed);
 	UE_LOG(LogTemp, Log, TEXT("퀘스트 완료: %s"), *QuestID.ToString());
 	return true;
+
+	// State->Status = EQuestStatus::Completed;
+	//
+	// GrantRewards(QuestID);
+	//
+	// OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::Completed);
+	// UE_LOG(LogTemp, Log, TEXT("퀘스트 완료: %s"), *QuestID.ToString());
+	// return true;
 }
 
 bool UQuestManagerSubsystem::FailQuest(FName QuestID)
@@ -240,6 +273,37 @@ bool UQuestManagerSubsystem::CanAcceptQuest(FName QuestID) const
 	return CheckPreRequiredQuests(QuestData);
 }
 
+bool UQuestManagerSubsystem::IsQuestPendingPrerequisite(FName QuestID) const
+{
+	const UQuestData* QuestData = QuestDataMap.FindRef(QuestID);
+	if (!QuestData)
+	{
+		return false;
+	}
+
+	const EQuestStatus CurrentStatus = GetQuestStatus(QuestID);
+	if (CurrentStatus != EQuestStatus::NotStarted &&
+		CurrentStatus != EQuestStatus::Abandoned)
+	{
+		return false;
+	}
+
+	if (QuestData->PreRequiredQuests.IsEmpty())
+	{
+		return false;
+	}
+
+	for (const FName& PrerequisiteID : QuestData->PreRequiredQuests)
+	{
+		if (!IsQuestCompleted(PrerequisiteID))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 int32 UQuestManagerSubsystem::GetObjectiveCount(FName QuestID, FName ObjectiveID) const
 {
 	const FQuestState* State = QuestStateMap.Find(QuestID);
@@ -310,45 +374,64 @@ void UQuestManagerSubsystem::CheckQuestCompletion(FName QuestID)
 
 	for (const FQuestObjective& Objective : QuestData->QuestObjectives)
 	{
-		bool bComplete = IsObjectiveComplete(QuestID, Objective);
-		if (bComplete)
-		{
-			bAnyComplete = true;
-		}
-		if (!Objective.bIsOptional && !bComplete)
+		if (!Objective.bIsOptional && !IsObjectiveComplete(QuestID, Objective))
 		{
 			bAllRequiredComplete = false;
+			break;
 		}
 	}
 
-	// 일부 완료 상태 갱신
-	if (bAnyComplete && !bAllRequiredComplete)
+	if (!bAllRequiredComplete)
 	{
+		// 모든 필수 목표가 완료된 게 아니면 상태 변경 없음.
+		// Active 상태를 그대로 유지.
+		return;
+	}
+	// // 일부 완료 상태 갱신
+	// if (bAnyComplete && !bAllRequiredComplete)
+	// {
+	// 	FQuestState* State = QuestStateMap.Find(QuestID);
+	// 	if (State && State->Status == EQuestStatus::Active)
+	// 	{
+	// 		State->Status = EQuestStatus::ObjectiveComplete;
+	// 		OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::ObjectiveComplete);
+	// 	}
+	// }
+
+	// // 전체 완료
+	// if (bAllRequiredComplete)
+	// {
+	// 	if (!QuestData->bRequireReturnToNPC)
+	// 	{
+	// 		CompleteQuest(QuestID);
+	// 	}
+	// 	else
+	// 	{
+	// 		// 위 일부 완료 상태 갱신은 목표가 1개일 경우 검사안하고 바로 완료로 가는 경우 방지
+	// 		// NPC에게 돌아가야 하는 퀘스트는 목표 완료 상태로 변경
+	// 		FQuestState* State = QuestStateMap.Find(QuestID);
+	// 		if (State && State->Status == EQuestStatus::Active)
+	// 		{
+	// 			State->Status = EQuestStatus::ObjectiveComplete;
+	// 			OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::ObjectiveComplete);
+	// 		}
+	// 	}
+	// }
+
+	// 모든 필수 목표 완료
+	if (!QuestData->bRequireReturnToNPC)
+	{
+		// NPC 보고가 필요 없는 퀘스트는 즉시 완료
+		CompleteQuest(QuestID);
+	}
+	else
+	{
+		// NPC에게 보고해야 완료되는 퀘스트 → ObjectiveComplete로 전환
 		FQuestState* State = QuestStateMap.Find(QuestID);
 		if (State && State->Status == EQuestStatus::Active)
 		{
 			State->Status = EQuestStatus::ObjectiveComplete;
 			OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::ObjectiveComplete);
-		}
-	}
-
-	// 전체 완료
-	if (bAllRequiredComplete)
-	{
-		if (!QuestData->bRequireReturnToNPC)
-		{
-			CompleteQuest(QuestID);
-		}
-		else
-		{
-			// 위 일부 완료 상태 갱신은 목표가 1개일 경우 검사안하고 바로 완료로 가는 경우 방지
-			// NPC에게 돌아가야 하는 퀘스트는 목표 완료 상태로 변경
-			FQuestState* State = QuestStateMap.Find(QuestID);
-			if (State && State->Status == EQuestStatus::Active)
-			{
-				State->Status = EQuestStatus::ObjectiveComplete;
-				OnQuestStatusChanged.Broadcast(QuestID, EQuestStatus::ObjectiveComplete);
-			}
 		}
 	}
 }

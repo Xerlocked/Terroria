@@ -114,6 +114,9 @@ public:
 	bool CanAcceptQuest(FName QuestID) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
+	bool IsQuestPendingPrerequisite(FName QuestID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
 	int32 GetObjectiveCount(FName QuestID, FName ObjectiveID) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")

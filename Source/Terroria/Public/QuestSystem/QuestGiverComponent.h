@@ -18,6 +18,8 @@ enum class ENPCMarkerState : uint8
 	QuestComplete UMETA(DisplayName = "QuestComplete", ToolTip = "완료 가능한 퀘스트 있음"),
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestMarkerStateChanged, ENPCMarkerState, NewState);
+
 UCLASS(ClassGroup=(Quest), meta=(BlueprintSpawnableComponent))
 class TERRORIA_API UQuestGiverComponent : public UActorComponent
 {
@@ -25,6 +27,12 @@ class TERRORIA_API UQuestGiverComponent : public UActorComponent
 
 public:
 	UQuestGiverComponent();
+
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UPROPERTY(BlueprintAssignable, Category = "Quest")
+	FOnQuestMarkerStateChanged OnQuestMarkerStateChanged;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestGiverComponent")
 	TArray<UQuestData*> OfferedQuests;
@@ -43,6 +51,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestGiver")
 	TArray<UQuestData*> GetActiveQuests() const;
 
+	/** 
+	 * 이 NPC가 제공하는 퀘스트 중, 선행 퀘스트만 끝나면 바로 받을 수 있는 것들.
+	 * 연계 퀘스트가 있는 NPC라도 마커를 진행 중(QuestActive)으로만 
+	 * 표시하지 않도록 하기 위한 헬퍼.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "QuestGiver")
+	bool HasPendingChainQuest() const;
+
 	// 퀘스트 제공 가능 여부
 	UFUNCTION(BlueprintCallable, Category = "QuestGiver")
 	bool HasAvailableQuest() const;
@@ -55,12 +71,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestGiver")
 	bool OfferQuest(FName QuestID);
 
-protected:
-	virtual void BeginPlay() override;
-
 private:
 	UPROPERTY()
 	UQuestManagerSubsystem* QuestManager = nullptr;
 
 	bool EnsureQuestManager() const;
+
+	UFUNCTION()
+	void HandleQuestStatusChanged(FName QuestID, EQuestStatus NewStatus);
+
+	ENPCMarkerState CachedMarkerState = ENPCMarkerState::None;
 };
