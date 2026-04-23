@@ -27,7 +27,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsRepeatable;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<USoundBase> VoiceAsset;
 };

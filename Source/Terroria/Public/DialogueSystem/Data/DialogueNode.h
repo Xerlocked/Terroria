@@ -47,7 +47,4 @@ struct FDialogueNode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FDialogueEvent> NodeEvents;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<USoundCue> AudioCue = nullptr;
 };

@@ -4,6 +4,7 @@
 #include "Helper/TerroriaBlueprintLibrary.h"
 
 #include "GameplayTagContainer.h"
+#include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Struct.h"
 #include "Components/CapsuleComponent.h"
@@ -21,7 +22,7 @@ FVector UTerroriaBlueprintLibrary::GetFurthestValidLocation(
 	bool bIgnoreSelf)
 {
 	FVector OutVector = StartLocation;
-	const UWorld* World = WorldContextObject->GetWorld();
+	UWorld* World = WorldContextObject->GetWorld();
 
 	FVector UnitDirection = (EndLocation - StartLocation).GetSafeNormal();
 	const float CapsuleDiameter = CapsuleComponent->GetScaledCapsuleRadius() * 2.f;
@@ -31,29 +32,71 @@ FVector UTerroriaBlueprintLibrary::GetFurthestValidLocation(
 
 	for (int32 i = 0; i < CapsuleSteps; i++)
 	{
+		// const int32 Step = CapsuleSteps - i;
+		// const FVector Location = UnitDirection * Step * CapsuleDiameter + StartLocation;
+		//
+		// // 캡슐이 이동 가능한 곳에 뭐가 있는지
+		// TArray<FHitResult> HitResults;
+		// UKismetSystemLibrary::CapsuleTraceMultiForObjects(
+		// 	World,
+		// 	Location,
+		// 	Location,
+		// 	CapsuleComponent->GetUnscaledCapsuleRadius(),
+		// 	CapsuleComponent->GetUnscaledCapsuleHalfHeight(),
+		// 	ObjectTypes,
+		// 	false,
+		// 	ActorsToIgnore,
+		// 	DrawDebugType,
+		// 	HitResults,
+		// 	bIgnoreSelf
+		// );
+		//
+		// if (IsValidLocation(WorldContextObject, Location, HitResults))
+		// {
+		// 	OutVector = Location;
+		// 	break;
+		// }
+
 		const int32 Step = CapsuleSteps - i;
-		const FVector Location = UnitDirection * Step * CapsuleDiameter + StartLocation;
+		const FVector BaseLocation = UnitDirection * Step * CapsuleDiameter + StartLocation;
 
-		// 캡슐이 이동 가능한 곳에 뭐가 있는지
-		TArray<FHitResult> HitResults;
-		UKismetSystemLibrary::CapsuleTraceMultiForObjects(
-			World,
-			Location,
-			Location,
-			CapsuleComponent->GetUnscaledCapsuleRadius(),
-			CapsuleComponent->GetUnscaledCapsuleHalfHeight(),
-			ObjectTypes,
-			false,
-			ActorsToIgnore,
-			DrawDebugType,
-			HitResults,
-			bIgnoreSelf
-		);
+		FVector AdjustedLocation = BaseLocation;
 
-		if (IsValidLocation(WorldContextObject, Location, HitResults))
+		// 1. 네비게이션 시스템을 이용해 Z축 높이 보정 및 절벽 방지
+		UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(World);
+		FNavLocation ProjectedLocation;
+
+		// Z 범위를 넉넉하게 주어(예: 500) 위아래 경사로의 NavMesh를 찾음
+		FVector QueryExtent(CapsuleComponent->GetScaledCapsuleRadius(), CapsuleComponent->GetScaledCapsuleRadius(),
+		                    500.0f);
+
+		if (NavSys && NavSys->ProjectPointToNavigation(BaseLocation, ProjectedLocation, QueryExtent))
 		{
-			OutVector = Location;
-			break;
+			// 2. 바닥 표면 좌표를 얻었으므로, 캐릭터가 파묻히지 않게 캡슐 높이의 절반을 올려줌
+			AdjustedLocation = ProjectedLocation.Location;
+			AdjustedLocation.Z += CapsuleComponent->GetScaledCapsuleHalfHeight();
+
+			// 3. 동적 장애물(다른 캐릭터, 동적 벽 등) 검사를 위해 캡슐 트레이스 실행
+			TArray<FHitResult> HitResults;
+			UKismetSystemLibrary::CapsuleTraceMultiForObjects(
+				World,
+				AdjustedLocation,
+				AdjustedLocation,
+				CapsuleComponent->GetUnscaledCapsuleRadius(),
+				CapsuleComponent->GetUnscaledCapsuleHalfHeight(),
+				ObjectTypes,
+				false,
+				ActorsToIgnore,
+				DrawDebugType,
+				HitResults,
+				bIgnoreSelf
+			);
+
+			if (IsValidLocation(WorldContextObject, AdjustedLocation, HitResults))
+			{
+				OutVector = AdjustedLocation;
+				break;
+			}
 		}
 	}
 
