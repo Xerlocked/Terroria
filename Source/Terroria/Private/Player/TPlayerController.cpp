@@ -3,10 +3,12 @@
 
 #include "Public/Player/TPlayerController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "TGameplayTags.h"
 #include "AbilitySystem/Component/GameplayInputQueueSystem.h"
 #include "Character/TPlayerCharacter.h"
@@ -267,6 +269,8 @@ void ATPlayerController::ReleasedAbilityAction(const FInputActionValue& Value, c
 		MousePressTime = 0.f;
 		bIsTargeting = false;
 
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FXCursor, CachedDestination);
+
 		if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(
 			this, PossessedCharacter->GetActorLocation(), CachedDestination))
 		{
@@ -357,6 +361,7 @@ void ATPlayerController::OnDialogueStarted(ACharacter* InPlayer, ACharacter* NPC
 	}
 
 	bIsInDialogue = true;
+	OnCameraModeChange.Broadcast(true);
 }
 
 void ATPlayerController::OnDialogueEnded(ACharacter* InPlayer)
@@ -375,6 +380,7 @@ void ATPlayerController::OnDialogueEnded(ACharacter* InPlayer)
 	}
 
 	bIsInDialogue = false;
+	OnCameraModeChange.Broadcast(false);
 }
 
 UTAbilitySystemComponent* ATPlayerController::GetTASC()

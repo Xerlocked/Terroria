@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/PlayerController.h"
 #include "GameplayTagContainer.h"
 #include "Terroria.h"
@@ -28,6 +27,7 @@ class UInputMappingContext;
  */
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetingDelegate, AActor*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCameraModeChangeDelegate, bool, bIsCinematic);
 
 UCLASS(Abstract)
 class TERRORIA_API ATPlayerController : public APlayerController
@@ -67,6 +67,9 @@ public:
 	UTShopComponent* GetShopComponent() const { return ShopComponent; }
 
 	FOnTargetingDelegate OnTargeting;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events|Camera")
+	FOnCameraModeChangeDelegate OnCameraModeChange;
 
 protected:
 	virtual void SetupInputComponent() override;
