@@ -62,21 +62,20 @@ FVector UTerroriaBlueprintLibrary::GetFurthestValidLocation(
 
 		FVector AdjustedLocation = BaseLocation;
 
-		// 1. 네비게이션 시스템을 이용해 Z축 높이 보정 및 절벽 방지
+		// 네비게이션 시스템을 이용해 Z축 높이 보정 및 절벽 방지
 		UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(World);
 		FNavLocation ProjectedLocation;
 
-		// Z 범위를 넉넉하게 주어(예: 500) 위아래 경사로의 NavMesh를 찾음
+		// 위아래 경사로의 NavMesh를 찾음
 		FVector QueryExtent(CapsuleComponent->GetScaledCapsuleRadius(), CapsuleComponent->GetScaledCapsuleRadius(),
 		                    500.0f);
 
 		if (NavSys && NavSys->ProjectPointToNavigation(BaseLocation, ProjectedLocation, QueryExtent))
 		{
-			// 2. 바닥 표면 좌표를 얻었으므로, 캐릭터가 파묻히지 않게 캡슐 높이의 절반을 올려줌
+			// 캡슐 높이의 보정
 			AdjustedLocation = ProjectedLocation.Location;
 			AdjustedLocation.Z += CapsuleComponent->GetScaledCapsuleHalfHeight();
 
-			// 3. 동적 장애물(다른 캐릭터, 동적 벽 등) 검사를 위해 캡슐 트레이스 실행
 			TArray<FHitResult> HitResults;
 			UKismetSystemLibrary::CapsuleTraceMultiForObjects(
 				World,
