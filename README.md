@@ -1,13 +1,15 @@
-# Terroria
+<div align="center">
+  <h1>Terroria</h1>
+</div>
 
 ![Logo](./Image/Logo.png)
-
-> **GAS 기반 탑다운 액션 RPG** — 언리얼 엔진 5로 구현된 멀티플레이 지원 RPG 프레임워크
 
 ![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.6-0E1128?style=flat-square&logo=unrealengine&logoColor=white)
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?style=flat-square&logo=cplusplus&logoColor=white)
 ![GAS](https://img.shields.io/badge/Gameplay%20Ability%20System-Integrated-purple?style=flat-square)
 ![License](https://img.shields.io/badge/License-Copyright%20%40xerlock-red?style=flat-square)
+
+> **GAS 기반 탑다운 액션 RPG** — 언리얼 엔진 5로 구현된 멀티플레이 지원 RPG Game
 
 ---
 
@@ -15,8 +17,9 @@
 
 **Terroria**는 언리얼 엔진 5의 **Gameplay Ability System(GAS)** 을 핵심 골격으로 삼아 설계된 탑다운 액션 RPG입니다.
 
-클릭-투-무브 방식의 조작, 퀘스트·대화·상점 시스템, 행동 트리 기반 AI, 멀티플레이 복제(Replication) 아키텍처까지 — RPG 장르를 구성하는 주요 시스템을 모두 C++로 직접 구현한 것이 특징입니다. 블루프린트 확장성을 염두에 두고 설계되어, 디자이너와 프로그래머 모두가 유연하게 콘텐츠를 추가할 수 있습니다.
+클릭-투-무브 방식의 조작, 퀘스트·대화·상점 시스템, 행동 트리 기반 AI, 멀티플레이 복제(Replication) 아키텍처까지 — RPG 장르를 구성하는 주요 시스템을 모두 C++로 직접 구현하였습니다. 또한 블루프린트 확장성을 염두에 두고 설계되어, 디자이너와 프로그래머 모두가 유연하게 콘텐츠를 추가할 수 있습니다.
 
+> **Notice**: 소스코드만 업로드 되어있습니다. 리소스 파일은 제공하지 않습니다.
 ---
 
 ## ✨ 주요 특징 (Key Features)
