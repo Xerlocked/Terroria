@@ -11,6 +11,8 @@
 
 > **GAS 기반 탑다운 액션 RPG** — 언리얼 엔진 5로 구현된 멀티플레이 지원 RPG Game
 
+📹 Youtube: [Link](https://www.youtube.com/watch?v=iabD4uI2ZHE)
+
 ---
 
 ## 📖 프로젝트 소개
